@@ -1,0 +1,11 @@
+.godot/
+build/
+.tools/
+.DS_Store
+*.tmp
+*.log
+node_modules/
+__pycache__/
+.env
+.env.*
+!.env.example
