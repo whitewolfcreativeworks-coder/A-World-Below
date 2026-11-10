@@ -34,7 +34,7 @@ const path = require('node:path');
       y: canvas.y + (canvas.height - 800 * scale) / 2 + y * scale,
     });
     const tap = async (x, y) => { const p = point(x, y); await page.touchscreen.tap(p.x, p.y); };
-    await tap(640, 588);
+    await page.keyboard.press('Escape');
     await page.waitForTimeout(500);
     await page.screenshot({ path: path.join(directory, '01-start.png') });
     const cdp = await context.newCDPSession(page);
@@ -47,8 +47,15 @@ const path = require('node:path');
     await tap(1015, 48);
     await page.waitForTimeout(500);
     await page.screenshot({ path: path.join(directory, '03-journal.png') });
+    await page.keyboard.press('Escape');
+    await tap(1100, 96);
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: path.join(directory, '04-specimen.png') });
+    await tap(891, 563);
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: path.join(directory, '05-plume.png') });
     if (errors.length) throw new Error(errors.join('\n'));
-    console.log('Web runtime loaded; touch and journal screenshots captured; no runtime errors.');
+    console.log('Web runtime loaded; touch, journal and specimen screenshots captured; no runtime errors.');
     console.log('Inspect screenshots for visual/interaction results. This is not a physical iPad Safari test.');
   } finally {
     await browser.close();

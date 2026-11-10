@@ -1,0 +1,29 @@
+{
+  "asset": "https://polyhaven.com/a/rock_boulder_dry",
+  "license": "https://polyhaven.com/license",
+  "use": "Rock surface reference; not a photograph of a hydrothermal vent.",
+  "files": [
+    {
+      "file": "basalt_albedo.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rock_boulder_dry/rock_boulder_dry_diff_1k.jpg",
+      "license": "CC0-1.0",
+      "sha256": "20f653a42fb24f42aa40641663070d578678da49af18cc1049dbdd4ed8679f3c"
+    },
+    {
+      "file": "basalt_normal.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rock_boulder_dry/rock_boulder_dry_nor_gl_1k.jpg",
+      "license": "CC0-1.0",
+      "sha256": "5915fea28a97357c78a04fb31c2516f1f7ed1b3a9cef4ae25aa93e4655e6c595"
+    },
+    {
+      "file": "basalt_roughness.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rock_boulder_dry/rock_boulder_dry_rough_1k.jpg",
+      "license": "CC0-1.0",
+      "sha256": "cc5229dd6bbdc4e817cb647e60242224b8e4f0237473ac018861ea243f2e8130"
+    }
+  ],
+  "authors": {
+    "Dimitrios Savva": "Photography",
+    "Rico Cilliers": "Processing"
+  }
+}

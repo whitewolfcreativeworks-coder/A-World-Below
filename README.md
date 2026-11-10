@@ -1,9 +1,27 @@
 # A World Below
 
 A free, open-source 3D deep-ocean exploration game, built with **Godot 4.6.3**.
-Leave a capsule village, observe deep-sea animals, gather mineral fragments,
-and return home to expand the settlement. The ocean uses a consistent seed,
-so revisiting an area recreates the same terrain.
+Search for extremophiles and unusual organisms, examine their adaptations in
+3D, and develop research-inspired technology for an underwater village. Visual
+detail is the priority; the generated world grows around that experience.
+
+## Vent Garden visual study
+
+The current build focuses on a compact vent habitat and a detailed, rotatable
+Riftia tubeworm illustration. Use **SPECIMEN 01** to enter a separately lit 3D
+study, orbit the model, zoom in, and focus on its plume, tube, and symbiosis.
+The model is an anatomical illustration, not a measured scientific specimen.
+
+![Vent Garden visual study](docs/vent-garden.jpg)
+![Rotatable Riftia anatomical illustration](docs/riftia-plume.jpg)
+
+New production assets include original Blender source models, reproducible
+geometry-generation code, CC0 rock materials, and underwater rendering shaders.
+See [the art direction and quality gate](docs/ART_DIRECTION.md). The research-to-
+technology loop is the design direction; it is not fully implemented yet.
+
+The earlier fragment/village loop remains available. Terrain uses a consistent
+seed, so revisiting an area recreates the same geometry.
 
 ![First Descent prototype running in Chromium](docs/first-descent.jpg)
 
@@ -31,7 +49,8 @@ import `project.godot`, and press **F5**. Or run `godot --path .`.
 
 On a tablet, play an exported build hosted over HTTPS in a current Safari or
 Chrome browser, preferably in landscape. The repository URL does not run the
-game. No public deployment is enabled automatically. Actual iPad Safari
+game. [Play the current study on GitHub Pages](https://whitewolfcreativeworks-coder.github.io/A-World-Below/).
+Actual iPad Safari
 performance has not yet been verified on a physical device.
 
 | Action | Keyboard / mouse | Touch |
@@ -84,6 +103,8 @@ XDG_DATA_HOME=/tmp/awb-expedition-tests godot --headless --path . --script tests
 
 Checks cover seed repeatability, chunk seams, depletion after revisiting,
 scanning, cargo limits, building, rescue, modal pause, and saving.
+`tests/test_specimen.gd` also checks that detailed 3D geometry loads, anatomy
+views frame correctly, orbit works, and inspection preserves expedition state.
 
 Optional browser smoke check (requires a local Playwright installation):
 `node tools/test_browser.cjs`. Set `CHROMIUM_PATH` if using a system browser.

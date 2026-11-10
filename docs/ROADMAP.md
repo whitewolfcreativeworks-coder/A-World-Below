@@ -1,5 +1,13 @@
 # Development roadmap
 
+## Current priority: visual detail and research
+
+The Vent Garden study and rotatable Riftia illustration establish the next
+visual benchmark. See ART_DIRECTION.md. Validate their quality and physical
+iPad performance before expanding the world. The long-term loop centers on
+extremophile research and village technologies; the bioreactor is still a design
+concept, not an implemented upgrade.
+
 ## First Descent — current foundation
 
 Swimming, generated terrain streaming, three animated animal groups, scanning,
@@ -30,6 +38,6 @@ CFD is not a goal.
 
 ## Delivery
 
-Choose free static hosting for an iPad play link when requested. Keep hosting
-separate from repository visibility. Native builds later. No store release,
-repository-setting change, paid hosting, or paid API activation in this prototype.
+The browser prototype is hosted on free GitHub Pages from the gh-pages branch.
+Keep hosting separate from source visibility and retain original save data on
+updates. Native builds later. No store release, paid hosting, or paid API use.

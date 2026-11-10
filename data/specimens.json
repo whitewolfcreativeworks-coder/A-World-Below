@@ -1,0 +1,17 @@
+{
+  "riftia": {
+    "name": "Giant tubeworm",
+    "scientific": "Riftia pachyptila",
+    "source": "https://www.mbari.org/animal/giant-tubeworm/",
+    "additional_sources": [
+      "https://pubmed.ncbi.nlm.nih.gov/15265029/",
+      "https://oceanexplorer.noaa.gov/ocean-fact/photochemo/"
+    ],
+    "whole": "Meet a landmark organism of hydrothermal vents. Its bacterial partners help sustain life far beyond sunlight.\n\nRotate the full 3D model. Move close enough to examine the plume, tube, and protective collar.\n\nSelect a structure below to explore its biology and research potential.",
+    "plume": "THE CRIMSON PLUME\n\nThe red respiratory plume exchanges substances with seawater. Hemoglobin helps transport oxygen and sulfide to the worm's internal bacterial partners.\n\nExamine the paired folds and fine filaments.",
+    "tube": "A PROTECTIVE HOME\n\nThe worm secretes a protective tube. Adults have no mouth or digestive tract: their bacterial symbionts supply nutrition.\n\nLook closely at the hollow rim and tube annulations.",
+    "symbiosis": "THE HIDDEN ENGINE\n\nBacteria housed in the trophosome use chemical energy to fix carbon. The animal and microbes form an intimate partnership.\n\nVILLAGE RESEARCH DIRECTION\nStudy this partnership → cultivate microbes → develop an experimental bioreactor.\n\nThat engineering upgrade is a proposed game mechanic, not a demonstrated technology copied from the worm.",
+    "interpretation": "An authored anatomical illustration with interpretive fine structure and proportions, not a measured specimen or a microscopy reconstruction. The worm is an animal; its bacterial partners perform chemosynthesis. It does not live in undiluted superheated vent fluid.",
+    "research_status": "Concept only. This visual benchmark does not yet award research or unlock a working bioreactor."
+  }
+}

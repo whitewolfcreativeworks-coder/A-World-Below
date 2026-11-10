@@ -18,7 +18,7 @@ func run() -> void:
 	await process_frame
 	game.progress = load("res://scripts/progress.gd").new()
 	game.hud.close_modal()
-	check(game.chunks.size() == 25, "Initial terrain must load")
+	check(game.chunks.size() == 9, "Compact terrain neighborhood must load")
 	check(game.hud.pad.get_global_rect().position.y > 0, "Touch controls must be on-screen")
 	check(game.hud.interact_button.get_global_rect().position.x > game.hud.root.size.x / 2, "Context action must be anchored to the right")
 	game.camera.position = game.animals[0].position + Vector3(0, 0, 7)
