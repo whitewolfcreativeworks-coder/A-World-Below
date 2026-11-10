@@ -1,5 +1,6 @@
 extends Control
-## One captured touch drives swimming. Other touches remain available to look.
+## Native touch ownership is handled before GUI dispatch by the game input router.
+## This control renders that state and retains real-mouse support for desktops.
 var axis := Vector2.ZERO
 var finger := -1
 var knob := Vector2.ZERO
@@ -11,17 +12,7 @@ func _ready() -> void:
 func _gui_input(event: InputEvent) -> void:
 	if event.device == InputEvent.DEVICE_ID_EMULATION:
 		return
-	if event is InputEventScreenTouch:
-		if event.pressed and finger == -1:
-			finger = event.index
-			_update_axis(event.position)
-		elif not event.pressed and event.index == finger:
-			reset()
-		accept_event()
-	elif event is InputEventScreenDrag and event.index == finger:
-		_update_axis(event.position)
-		accept_event()
-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			finger = -2
 			_update_axis(event.position)
@@ -31,6 +22,13 @@ func _gui_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and finger == -2:
 		_update_axis(event.position)
 		accept_event()
+
+func begin_touch(id: int, viewport_point: Vector2) -> void:
+	finger = id
+	drag_touch(viewport_point)
+
+func drag_touch(viewport_point: Vector2) -> void:
+	_update_axis(get_global_transform_with_canvas().affine_inverse() * viewport_point)
 
 func _update_axis(point: Vector2) -> void:
 	axis = ((point - size * 0.5) / 54.0).limit_length(1.0)

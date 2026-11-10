@@ -7,6 +7,7 @@ const Creature = preload("res://scripts/creature.gd")
 const Hud = preload("res://scripts/hud.gd")
 const VentGarden = preload("res://scripts/vent_garden.gd")
 const WaterMotion = preload("res://scripts/water_motion.gd")
+const TouchControls = preload("res://scripts/touch_controls.gd")
 const MAX_AIR := 300.0
 const HOME := Vector3(19, -5, 4)
 const SPAWN := Vector3(-13, -7, -1)
@@ -33,7 +34,8 @@ var pitch := -0.12
 var velocity := Vector3.ZERO
 var stream_clock := 0.0
 var save_clock := 0.0
-var look_finger := -1
+var touch_controls := TouchControls.new()
+var touch_buttons: Dictionary = {}
 var lamp: SpotLight3D
 var audio: AudioStreamPlayer
 var audio_enabled := false
@@ -83,6 +85,7 @@ func _ready() -> void:
 	_setup_audio()
 	hud = Hud.new(self)
 	add_child(hud)
+	get_viewport().size_changed.connect(clear_touch_controls)
 	_refresh_chunks(true)
 	_setup_intro_resources()
 	_pick_target()
@@ -572,6 +575,97 @@ func _save() -> void:
 	if not progress.save_game():
 		hud.toast("Saving is unavailable. Progress will last for this session only.")
 
+func clear_touch_controls() -> void:
+	touch_controls.reset()
+	var held := touch_buttons.values()
+	touch_buttons.clear()
+	for button in held:
+		if is_instance_valid(button):
+			_release_touch_button(button)
+	if is_instance_valid(hud) and is_instance_valid(hud.pad):
+		hud.pad.reset()
+		hud.vertical = 0
+
+func _update_touch_vertical() -> void:
+	var vertical := 0.0
+	for button in touch_buttons.values():
+		if is_instance_valid(button) and not button.disabled:
+			vertical += float(button.get_meta("swim_vertical", 0.0))
+	hud.vertical = clampf(vertical, -1.0, 1.0)
+
+func _press_touch_button(button: Button) -> void:
+	# BaseButton only exposes a persistent pressed visual in toggle mode.
+	# Touch capture owns the lifetime; restore the normal button mode on release.
+	button.set_meta("native_original_toggle", button.toggle_mode)
+	button.toggle_mode = true
+	button.set_pressed_no_signal(true)
+	button.button_down.emit()
+
+func _release_touch_button(button: Button) -> void:
+	if button.has_meta("native_original_toggle"):
+		button.set_pressed_no_signal(false)
+		button.toggle_mode = bool(button.get_meta("native_original_toggle"))
+		button.remove_meta("native_original_toggle")
+	button.button_up.emit()
+
+func _input(event: InputEvent) -> void:
+	if not is_instance_valid(hud) or hud.modal:
+		return
+	# Standard Controls use one emulated mouse; gameplay touch is routed per finger.
+	# Modal menus and the specimen viewer keep their existing GUI input path.
+	if event.device == InputEvent.DEVICE_ID_EMULATION:
+		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			var button: Button = hud.touch_button_at(event.position)
+			if button != null:
+				if touch_buttons.values().has(button):
+					get_viewport().set_input_as_handled()
+					return
+				touch_buttons[event.index] = button
+				if not button.disabled:
+					_press_touch_button(button)
+				_update_touch_vertical()
+				get_viewport().set_input_as_handled()
+				return
+			var width: float = hud.root.size.x
+			var height: float = hud.root.size.y
+			var look_area := Rect2(Vector2(width * 0.30, 0), Vector2(width * 0.70, height))
+			var role: String = touch_controls.press(event.index, event.position, hud.pad.get_global_rect(), look_area)
+			if role == "move":
+				hud.pad.begin_touch(event.index, event.position)
+			if role != "":
+				get_viewport().set_input_as_handled()
+		else:
+			if touch_buttons.has(event.index):
+				var button: Button = touch_buttons[event.index]
+				touch_buttons.erase(event.index)
+				if is_instance_valid(button):
+					_release_touch_button(button)
+					_update_touch_vertical()
+					if not event.canceled and not button.disabled and button.get_global_rect().has_point(event.position):
+						button.pressed.emit()
+				get_viewport().set_input_as_handled()
+				return
+			var role: String = touch_controls.release(event.index)
+			if role == "move":
+				hud.pad.reset()
+			if role != "":
+				get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag:
+		if touch_buttons.has(event.index):
+			get_viewport().set_input_as_handled()
+			return
+		var routed: Dictionary = touch_controls.drag(event.index, event.position)
+		if routed.is_empty():
+			return
+		if routed.role == "move":
+			hud.pad.drag_touch(event.position)
+		else:
+			_rotate_view(routed.delta * 0.004)
+		get_viewport().set_input_as_handled()
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_J:
@@ -591,15 +685,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				KEY_H: hud.show_recall()
 	if hud.modal:
 		return
-	if event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+	if event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION and touch_controls.positions.is_empty() and touch_buttons.is_empty() and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		_rotate_view(event.relative * 0.003)
-	if event is InputEventScreenTouch:
-		if event.pressed and look_finger == -1:
-			look_finger = event.index
-		elif not event.pressed and event.index == look_finger:
-			look_finger = -1
-	if event is InputEventScreenDrag and event.index == look_finger:
-		_rotate_view(event.relative * 0.004)
 
 func _rotate_view(delta: Vector2) -> void:
 	yaw -= delta.x
@@ -611,6 +698,4 @@ func _notification(what: int) -> void:
 		get_tree().quit()
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and is_instance_valid(hud):
 		progress.save_game()
-		hud.pad.reset()
-		hud.vertical = 0
-		look_finger = -1
+		clear_touch_controls()
