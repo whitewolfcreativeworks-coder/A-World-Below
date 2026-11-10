@@ -91,10 +91,12 @@ func _ready() -> void:
 	var height_buttons := HBoxContainer.new()
 	controls.add_child(height_buttons)
 	var up := _button("RISE", func(): pass)
+	up.set_meta("swim_vertical", 1.0)
 	up.button_down.connect(func(): vertical = 1.0)
 	up.button_up.connect(func(): vertical = 0.0)
 	height_buttons.add_child(up)
 	var down := _button("DIVE", func(): pass)
+	down.set_meta("swim_vertical", -1.0)
 	down.button_down.connect(func(): vertical = -1.0)
 	down.button_up.connect(func(): vertical = 0.0)
 	height_buttons.add_child(down)
@@ -150,8 +152,7 @@ func _button(text: String, callback: Callable) -> Button:
 
 func _open_modal() -> void:
 	modal = true
-	pad.reset()
-	vertical = 0
+	game.clear_touch_controls()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if is_instance_valid(overlay):
 		overlay.free()
@@ -170,6 +171,12 @@ func _open_modal() -> void:
 	overlay_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	overlay_content.add_theme_constant_override("separation", 14)
 	scroll.add_child(overlay_content)
+
+func touch_button_at(point: Vector2) -> Button:
+	for node in root.find_children("*", "Button", true, false):
+		if node.is_visible_in_tree() and node.get_global_rect().has_point(point):
+			return node
+	return null
 
 func _paragraph(text: String, color: Color = INK) -> void:
 	var label := _label(text, 19, color)
@@ -205,6 +212,7 @@ func show_specimen() -> void:
 func close_modal() -> void:
 	game.set_inspection_mode(false)
 	if is_instance_valid(overlay):
+		overlay.hide()
 		overlay.queue_free()
 	modal = false
 	game.start_expedition()
