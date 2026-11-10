@@ -3,7 +3,7 @@ extends RefCounted
 ## Terrain height is in local meters; displayed depth is 1400 - camera.y.
 
 const CHUNK_SIZE := 64.0
-const SEGMENTS := 16
+const SEGMENTS := 32
 const WORLD_SEED := 731942
 
 var seed_value: int
@@ -49,7 +49,7 @@ func mesh_for(chunk: Vector2i) -> ArrayMesh:
 	var step := CHUNK_SIZE / SEGMENTS
 	for z in range(SEGMENTS):
 		for x in range(SEGMENTS):
-			for corner in [Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:
+			for corner in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 0), Vector2i(1, 1), Vector2i(0, 1)]:
 				var px: float = chunk.x * CHUNK_SIZE + (x + corner.x) * step
 				var pz: float = chunk.y * CHUNK_SIZE + (z + corner.y) * step
 				var h := height_at(px, pz)

@@ -5,10 +5,11 @@ const Progress = preload("res://scripts/progress.gd")
 const Forms = preload("res://scripts/forms.gd")
 const Creature = preload("res://scripts/creature.gd")
 const Hud = preload("res://scripts/hud.gd")
+const VentGarden = preload("res://scripts/vent_garden.gd")
 const MAX_AIR := 300.0
-const HOME := Vector3(0, -3, 0)
-const SPAWN := Vector3(0, 2, 27)
-const VIEW_RADIUS := 2
+const HOME := Vector3(19, -5, 4)
+const SPAWN := Vector3(-13, -7, -1)
+const VIEW_RADIUS := 1
 
 var generator := WorldGen.new()
 var progress := Progress.new()
@@ -37,6 +38,23 @@ var audio: AudioStreamPlayer
 var audio_enabled := false
 var chunk_queue: Array[Vector2i] = []
 var last_chunk := Vector2i(99999, 99999)
+var garden: Node3D
+var seabed_material: Material
+var inspection_visibility: Dictionary = {}
+
+func set_inspection_mode(enabled: bool) -> void:
+	if enabled:
+		if not inspection_visibility.is_empty():
+			return
+		for child in get_children():
+			if child is Node3D and child != camera:
+				inspection_visibility[child] = child.visible
+				child.visible = false
+	else:
+		for child in inspection_visibility:
+			if is_instance_valid(child):
+				child.visible = inspection_visibility[child]
+		inspection_visibility.clear()
 
 func _ready() -> void:
 	progress.load_game()
@@ -63,19 +81,19 @@ func _setup_environment() -> void:
 	environment.background_color = Color("031320")
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color("4e8793")
-	environment.ambient_light_energy = 0.62
+	environment.ambient_light_energy = 0.55
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	environment.fog_enabled = true
 	environment.fog_light_color = Color("041a26")
 	environment.fog_light_energy = 0.65
-	environment.fog_density = 0.012
+	environment.fog_density = 0.010
 	environment.fog_sky_affect = 1.0
 	var world := WorldEnvironment.new()
 	world.environment = environment
 	add_child(world)
 	var light := DirectionalLight3D.new()
 	light.light_color = Color("669fa7")
-	light.light_energy = 0.55
+	light.light_energy = 0.40
 	light.rotation_degrees = Vector3(-65, -30, 0)
 	add_child(light)
 
@@ -83,17 +101,28 @@ func _setup_camera() -> void:
 	camera = Camera3D.new()
 	camera.position = SPAWN
 	camera.rotation = Vector3(pitch, yaw, 0)
-	camera.fov = 72
+	camera.fov = 66
 	camera.near = 0.2
-	camera.far = 300
+	camera.far = 180
 	add_child(camera)
 	lamp = SpotLight3D.new()
 	lamp.light_color = Color("a1e5dd")
-	lamp.light_energy = 3.0
+	lamp.light_energy = 5.0
 	lamp.spot_range = 65
 	lamp.spot_angle = 48
 	lamp.spot_attenuation = 0.7
 	camera.add_child(lamp)
+	get_viewport().msaa_3d = Viewport.MSAA_2X
+	var water := MeshInstance3D.new()
+	var quad := QuadMesh.new()
+	quad.size = Vector2(2, 2)
+	water.mesh = quad
+	water.extra_cull_margin = 16384
+	var water_material := ShaderMaterial.new()
+	water_material.shader = load("res://shaders/underwater.gdshader")
+	water_material.render_priority = 100
+	water.material_override = water_material
+	camera.add_child(water)
 
 func _setup_village() -> void:
 	village = Node3D.new()
@@ -112,11 +141,12 @@ func _add_capsule(index: int) -> void:
 	Forms.tube(village, HOME, point, 0.7, Forms.material(Color("1c454e"), 0.0, 0.5))
 
 func _setup_animals() -> void:
-	var positions := [Vector3(-14, 1, -10), Vector3(23, -3, -39), Vector3(-9, generator.height_at(-9, -22) + 0.7, -22)]
+	var positions := [Vector3(18, 3, -75), Vector3(34, -3, -65), Vector3(4, generator.height_at(4, -45) + 0.5, -45)]
 	for i in range(records.size()):
 		var animal := Creature.new()
 		add_child(animal)
 		animal.setup(records[i], positions[i], i * 2.7)
+		animal.scale = Vector3.ONE * 0.55
 		animals.append(animal)
 
 func _setup_snow() -> void:
@@ -140,15 +170,10 @@ func _setup_snow() -> void:
 	add_child(snow)
 
 func _setup_vent() -> void:
-	var at := Vector3(43, generator.height_at(43, -65), -65)
-	var stone := Forms.material(Color("152e34"), 0.0, 0.2)
-	for i in range(5):
-		Forms.cylinder(self, at + Vector3(i * 1.7 - 4, (4 + i % 3) * 0.5, sin(i) * 3), 1.5, 4 + i % 3, stone, 0.65)
-	for i in range(14):
-		var puff := Forms.sphere(self, at + Vector3(0, 6 + i, 0), Vector3.ONE * (1.0 + i * 0.19), Forms.material(Color("24464d")))
-		puff.set_meta("origin", at)
-		smoke.append(puff)
-	Forms.light(self, at + Vector3(0, 4, 0), Color("53a5ab"), 2.0, 20)
+	garden = VentGarden.new()
+	add_child(garden)
+	garden.build(generator)
+	seabed_material = garden.floor_material
 
 func _setup_audio() -> void:
 	# Quiet synthesized ambience; it contains no third-party sound recordings.
@@ -180,12 +205,13 @@ func toggle_audio() -> void:
 func start_expedition() -> void:
 	if not started:
 		started = true
-		hud.toast("Welcome to Pelagic. Find an animal, then approach to scan.")
+		hud.toast("Vent Garden · Look for the crimson tubeworm colony. Tap SPECIMEN to examine its anatomy.")
 
 func _process(delta: float) -> void:
 	elapsed += delta
 	for animal in animals:
 		animal.animated = not hud.modal
+	garden.set_paused(hud.modal)
 	if not hud.modal and started:
 		_move_player(delta)
 		_update_air(delta)
@@ -307,14 +333,10 @@ func _create_chunk(chunk: Vector2i) -> void:
 	chunks[chunk] = root
 	var terrain := MeshInstance3D.new()
 	terrain.mesh = generator.mesh_for(chunk)
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.roughness = 0.98
-	terrain.material_override = mat
+	terrain.material_override = seabed_material
 	root.add_child(terrain)
 	var rng := generator.rng_for(chunk)
-	var stone := Forms.material(Color("1b3a40"))
-	var biolight := Forms.material(Color("52c6ba"), 0.7)
+	var stone: Material = garden.rock_material
 	for i in range(9):
 		var x := (chunk.x + rng.randf()) * generator.CHUNK_SIZE
 		var z := (chunk.y + rng.randf()) * generator.CHUNK_SIZE
@@ -323,10 +345,8 @@ func _create_chunk(chunk: Vector2i) -> void:
 		var at := Vector3(x, generator.height_at(x, z), z)
 		var size := rng.randf_range(1.0, 4.2)
 		var rock := Forms.sphere(root, at, Vector3(size * 2, size, size * 1.4), stone)
+		rock.mesh = VentGarden.crag_mesh(i % 4)
 		rock.rotation = Vector3(rng.randf(), rng.randf() * TAU, rng.randf())
-		for j in range(3):
-			var base := at + Vector3(j * 0.7, 0.5, 0)
-			Forms.tube(root, base, base + Vector3(sin(j) * 0.8, 1.6 + rng.randf() * 2.1, 0.4), 0.045, biolight)
 	var positions := generator.resource_positions(chunk)
 	for i in range(positions.size()):
 		_spawn_resource(root, generator.resource_id(chunk, i), positions[i])
@@ -338,7 +358,8 @@ func _spawn_resource(parent: Node3D, id: String, point: Vector3) -> void:
 	node.position = point
 	node.set_meta("resource_id", id)
 	parent.add_child(node)
-	var mineral := Forms.material(Color("d6c388"), 1.2)
+	var mineral := Forms.material(Color("9c9a7b"), 0.03, 0.1)
+	node.scale = Vector3.ONE * 0.45
 	var mesh := Forms.cylinder(node, Vector3.ZERO, 0.55, 1.5, mineral, 0.0)
 	mesh.rotation.z = 0.2
 	Forms.cylinder(node, Vector3(0.45, -0.3, 0.1), 0.3, 0.9, mineral, 0.0).rotation.z = -0.5
@@ -366,15 +387,21 @@ func _pick_target() -> void:
 		if distance < 7.0 and distance < nearest:
 			nearest = distance
 			target = {"kind": "resource", "node": node, "id": id, "distance": distance}
+	if garden.specimen != null:
+		var distance := camera.position.distance_to(garden.specimen.position + Vector3(0, 2, 0))
+		if distance < 12 and (target == null or distance < nearest):
+			target = {"kind": "specimen", "node": garden.specimen, "distance": distance}
 
 func interaction_prompt() -> String:
 	if target != null:
+		if target.kind == "specimen":
+			return "RIFTIA COLONY  ·  %d m\nExamine the organism and its bacterial partnership" % roundi(target.distance)
 		if target.kind == "creature":
 			return "LIFE DETECTED  ·  %d m\nScan %s" % [roundi(target.distance), target.node.record.name]
 		return "MINERAL FRAGMENT  ·  %d m\nCollect and bring it home" % roundi(target.distance)
 	if home_distance() < 22:
 		return "PELAGIC STATION\nLife support refilling · cargo deposited automatically"
-	return "Follow the warm fragments. Watch for life in the darkness."
+	return "Investigate the crimson plumes. Examine the life that thrives here."
 
 func interact() -> void:
 	if hud.modal:
@@ -386,6 +413,9 @@ func interact() -> void:
 	if target.kind == "creature":
 		if progress.scan(target.node.record.id):
 			hud.toast("Documented: %s. Read its story in your field journal." % target.node.record.name)
+	elif target.kind == "specimen":
+		hud.show_specimen()
+		return
 	else:
 		if progress.collect(target.id):
 			var node: Node3D = target.node

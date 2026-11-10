@@ -9,6 +9,9 @@ web = root / "build/web"
 if not (web / "index.html").exists():
     raise SystemExit("Export the Web preset before packaging.")
 shutil.copytree(root / "LICENSES", web / "LICENSES", dirs_exist_ok=True)
+provenance = root / "assets/materials/provenance.json"
+if provenance.exists():
+    shutil.copy2(provenance, web / "LICENSES/PolyHaven-provenance.json")
 for name in ("LICENSE", "THIRD_PARTY_NOTICES.md"):
     shutil.copy2(root / name, web / name)
 for path in web.rglob("*.import"):

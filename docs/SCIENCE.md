@@ -3,6 +3,20 @@
 Research checked 2026-11-10. These are broad animal groups, not claims that one
 identified species naturally occupies every generated coordinate.
 
+## Vent Garden specimen
+
+Riftia pachyptila is illustrated in the new 3D inspector. Primary references:
+[MBARI giant tubeworm](https://www.mbari.org/animal/giant-tubeworm/) and
+[Minic & Hervé, 2004](https://pubmed.ncbi.nlm.nih.gov/15265029/). The worm hosts
+chemoautotrophic bacterial symbionts in the trophosome. Adults lack a digestive
+tract. Respiratory pigments help transport substrates needed by the partnership.
+The animal lives in the mixing environment near vents, not undiluted superheated
+discharge. Its illustrative geometry and proportions are not specimen measurements.
+
+The bioreactor is a proposed fictional engineering research chain, not a claim
+that this animal directly supplies a ready-made technology. New specimen facts
+and interpretation notes are stored separately in `data/specimens.json`.
+
 | Group | Primary reference | Facts reflected |
 | --- | --- | --- |
 | Atolla spp. | [MBARI crown jelly](https://www.mbari.org/animal/deep-sea-crown-jelly/) | Bell pulsation, tentacles, bioluminescent burglar-alarm interpretation. |
@@ -15,10 +29,12 @@ identified species naturally occupies every generated coordinate.
   Regional distributions and species-level depth constraints remain future work.
 - Sizes are exaggerated. Dumbo and isopod models do not naturally glow. The
   jelly's persistent color is not its episodic blue defensive display.
-- Glowing seafloor stalks are fictional scenery, not photosynthetic plants.
-  There is no sunlight or surface caustics in this region.
-- Visibility is increased for readability. Vent plumes are animated geometry,
-  not computational fluid dynamics. No physical current/temperature model yet.
+- Earlier fictional glowing stalk scenery has been removed from the vent study.
+  There is no sunlight or surface caustics in this region. Research floodlights
+  and increased ambient visibility serve readability.
+- Vent plumes now use particulate billboards, not computational fluid dynamics.
+  There is no physical current/temperature model yet. The rock material is a
+  visual reference, not an authenticated vent mineralogy reconstruction.
 - Capsule engineering, life support, rescue, and mineral gathering are gameplay
   abstractions. This is not a proposed real-world habitat.
 - Hadal/abyssal communities, extremophile microbes, chemosynthesis, cold seeps,

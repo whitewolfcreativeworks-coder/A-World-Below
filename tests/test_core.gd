@@ -22,6 +22,8 @@ func _initialize() -> void:
 	check(a.resource_positions(Vector2i(-2, 3)) == b.resource_positions(Vector2i(-2, 3)), "Resources must regenerate identically")
 	# The same boundary world coordinates must produce the same height on both meshes.
 	var left: PackedVector3Array = a.mesh_for(Vector2i(0, 0)).surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+	var normals: PackedVector3Array = a.mesh_for(Vector2i(0, 0)).surface_get_arrays(0)[Mesh.ARRAY_NORMAL]
+	check(normals[0].y > 0.5, "Seabed faces and lighting normals must point upward")
 	var right: PackedVector3Array = a.mesh_for(Vector2i(1, 0)).surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
 	var edge: Dictionary = {}
 	for vertex in left:

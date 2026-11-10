@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 const TouchPad = preload("res://scripts/touch_pad.gd")
+const Inspector = preload("res://scripts/specimen_inspector.gd")
 const INK := Color("c9e5e1")
 const MINT := Color("82ddc4")
 var game: Node3D
@@ -23,6 +24,7 @@ var modal := true
 var vertical := 0.0
 var toast_time := 0.0
 var last_prompt := ""
+var specimen_view: Control
 
 func _init(owner_game: Node3D = null) -> void:
 	game = owner_game
@@ -41,9 +43,9 @@ func _ready() -> void:
 	var status := VBoxContainer.new()
 	_place(status, Vector2(30, 26), Vector2(320, 200))
 	status.add_child(_label("A  W O R L D  B E L O W", 16, MINT))
-	depth_label = _label("1,400 m", 40)
+	depth_label = _label("1,400 m", 30)
 	status.add_child(depth_label)
-	status.add_child(_label("BATHYPELAGIC  /  PELAGIC STATION", 12, Color("78a3a7")))
+	status.add_child(_label("VENT GARDEN  /  RESEARCH EXPEDITION", 12, Color("78a3a7")))
 	home_label = _label("", 15)
 	status.add_child(home_label)
 	var right := VBoxContainer.new()
@@ -53,6 +55,7 @@ func _ready() -> void:
 	actions.add_child(_button("FIELD JOURNAL  [J]", show_journal))
 	sound_button = _button("SOUND OFF", func(): game.toggle_audio())
 	actions.add_child(sound_button)
+	right.add_child(_button("SPECIMEN 01 · EXAMINE IN 3D", show_specimen))
 	oxygen_label = _label("LIFE SUPPORT  ·  100%", 14)
 	right.add_child(oxygen_label)
 	oxygen = ProgressBar.new()
@@ -172,17 +175,32 @@ func _paragraph(text: String, color: Color = INK) -> void:
 
 func show_welcome() -> void:
 	_open_modal()
-	overlay_content.add_child(_label("AN EXPEDITION INTO THE DEEP", 14, MINT))
+	overlay.add_theme_stylebox_override("panel", _style(Color(0.005, 0.025, 0.04, 0.72), 0))
+	overlay_content.add_child(_label("VISUAL STUDY 02  /  THE VENT GARDEN", 14, MINT))
 	overlay_content.add_child(_label("A World Below", 58))
-	_paragraph("Beyond the last sunlight, a small home glows.")
-	_paragraph("Leave Pelagic Station. Follow the lights into a persistent, generated ocean. Observe its strange inhabitants, gather mineral fragments, and bring them home to grow your capsule village.")
-	_paragraph("FIRST EXPEDITION\nScan an animal. Collect four fragments. Return within 22 m of the station to deposit them, then expand your home.", MINT)
-	_paragraph("iPad: use the left swim pad, drag the open water to look, and hold RISE or DIVE.\nKeyboard: WASD to swim, drag to look, Space / C to rise / dive, E to interact.\nLife support refills near home. Your journal and village save on this device.")
-	_paragraph("Early prototype · original stylized creatures · no accounts or paid services.\nThis first region is bathypelagic. Abyssal and hadal habitats are planned; the current ecosystem is a simplified fictional assemblage.", Color("7fa5ab"))
-	overlay_content.add_child(_button("BEGIN EXPEDITION", close_modal))
+	_paragraph("Life at the edge of the impossible.")
+	_paragraph("Descend into a compact hydrothermal habitat. Examine a giant tubeworm in full 3D and discover the bacterial partnership that sustains it.")
+	_paragraph("DISCOVER  /  EXAMINE  /  UNDERSTAND  /  INVENT", MINT)
+	_paragraph("iPad: left pad to swim, drag open water to look, RISE / DIVE to change depth.\nIn the specimen viewer: drag to orbit, pinch or use the zoom buttons.")
+	overlay_content.add_child(_button("ENTER THE VENT GARDEN", close_modal))
+	overlay_content.add_child(_button("EXAMINE THE TUBEWORM · FULL 3D", show_specimen))
 	overlay_content.add_child(_button("TOOLS & CREDITS", show_credits))
+	_paragraph("Visual benchmark · original anatomical illustration · research-led fiction.\nThe existing village loop remains available; research-based technology progression is the next design direction.", Color("7fa5ab"))
+
+func show_specimen() -> void:
+	_open_modal()
+	game.set_inspection_mode(true)
+	overlay.add_theme_stylebox_override("panel", _style(Color("040e16"), 0))
+	var scroll: Node = overlay_content.get_parent()
+	var margin: Node = scroll.get_parent()
+	scroll.queue_free()
+	var inspector := Inspector.new()
+	specimen_view = inspector
+	margin.add_child(inspector)
+	inspector.closed.connect(close_modal)
 
 func close_modal() -> void:
+	game.set_inspection_mode(false)
 	if is_instance_valid(overlay):
 		overlay.queue_free()
 	modal = false
@@ -208,7 +226,7 @@ func show_credits() -> void:
 	_open_modal()
 	overlay_content.add_child(_label("BUILT WITH OPEN SOURCE", 36))
 	_paragraph("Godot Engine 4.6.3 · MIT license\nFastNoiseLite · MIT license · included with Godot\nBlender 4.3.2 · GPL production tool · available for the next art pass")
-	_paragraph("All current models, interface graphics, and synthesized audio are original procedural work. Research references: NOAA Ocean Exploration and MBARI. These organizations do not endorse this game.")
+	_paragraph("Original models, interface graphics, and synthesized audio. Bare-rock material maps: Poly Haven, CC0. Research references: NOAA Ocean Exploration and MBARI. These organizations do not endorse this game.")
 	_paragraph("Animal colors, scale, abundance, and coexistence are artistic simplifications. Capsule habitats and mineral gathering are fictional gameplay. No licensed scientific footage is bundled.")
 	overlay_content.add_child(_button("GODOT LICENSE & THIRD-PARTY NOTICES ↗", func(): OS.shell_open("https://godotengine.org/license/")))
 	overlay_content.add_child(_button("BACK TO THE OCEAN", close_modal))
@@ -239,12 +257,17 @@ func update_status(delta: float) -> void:
 		objective_label.text = "Village complete for this prototype. Keep exploring."
 	else:
 		objective_label.text = "Next capsule: %d fragments · Village %d / %d" % [game.progress.build_cost(), game.progress.modules + 1, game.progress.MAX_MODULES + 1]
+	if distance >= 22:
+		objective_label.text = "RESEARCH FOCUS\nVent symbiosis · examine Specimen 01"
 	build_button.disabled = distance >= 22 or game.progress.bank < game.progress.build_cost() or game.progress.modules >= game.progress.MAX_MODULES
 	var prompt: String = game.interaction_prompt()
 	prompt_label.text = prompt
 	interact_button.disabled = game.target == null
 	if game.target != null:
-		interact_button.text = "SCAN ANIMAL  [E]" if game.target.kind == "creature" else "COLLECT FRAGMENT  [E]"
+		if game.target.kind == "specimen":
+			interact_button.text = "EXAMINE RIFTIA  [E]"
+		else:
+			interact_button.text = "SCAN ANIMAL  [E]" if game.target.kind == "creature" else "COLLECT FRAGMENT  [E]"
 	else:
 		interact_button.text = "SCAN / COLLECT  [E]"
 	toast_time = maxf(0.0, toast_time - delta)
