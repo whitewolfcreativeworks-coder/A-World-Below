@@ -25,6 +25,8 @@ jobs:
         run: XDG_DATA_HOME="$RUNNER_TEMP/awb-expedition" godot --headless --path . --script tests/test_expedition.gd
       - name: Specimen inspection checks
         run: XDG_DATA_HOME="$RUNNER_TEMP/awb-specimen" godot --headless --path . --script tests/test_specimen.gd
+      - name: Water interaction checks
+        run: XDG_DATA_HOME="$RUNNER_TEMP/awb-water" godot --headless --path . --script tests/test_water.gd
       - name: Export browser build
         run: |
           mkdir -p build/web

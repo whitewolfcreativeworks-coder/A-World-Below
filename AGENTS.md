@@ -16,6 +16,7 @@ hosted inference, analytics, or secrets. Ask before any paid service.
 - Core checks: `godot --headless --path . --script tests/test_core.gd`
 - Integration checks: `godot --headless --path . --script tests/test_expedition.gd`
 - Specimen checks: `godot --headless --path . --script tests/test_specimen.gd`
+- Water checks: `godot --headless --path . --script tests/test_water.gd`
 - Export: `mkdir -p build/web && godot --headless --path . --export-release Web build/web/index.html`
 - Serve web builds over HTTP(S); opening index.html as a local file does not work.
 - Use separate XDG data/config directories for tests to avoid touching player saves.
@@ -31,6 +32,8 @@ hosted inference, analytics, or secrets. Ask before any paid service.
 - Detailed specimen facts live in data/specimens.json. Preserve Blender sources
   in art-source/ and export GLB for Godot; keep the source directory .gdignore'd.
 - Label fictional ecology, exaggerated scale, and artistic glow honestly.
+- Holographic overlays are research-instrument effects, distinct from natural
+  bioluminescence. Keep a natural-view option. Preserve the sway-off control.
 - Check licenses at the exact version of every added library or asset. Record
   source, license, and redistribution obligations in THIRD_PARTY_NOTICES.md.
 - Prefer permissive runtime code and CC0/CC BY assets with clear provenance.

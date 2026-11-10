@@ -6,6 +6,7 @@ const Forms = preload("res://scripts/forms.gd")
 const Creature = preload("res://scripts/creature.gd")
 const Hud = preload("res://scripts/hud.gd")
 const VentGarden = preload("res://scripts/vent_garden.gd")
+const WaterMotion = preload("res://scripts/water_motion.gd")
 const MAX_AIR := 300.0
 const HOME := Vector3(19, -5, 4)
 const SPAWN := Vector3(-13, -7, -1)
@@ -41,6 +42,16 @@ var last_chunk := Vector2i(99999, 99999)
 var garden: Node3D
 var seabed_material: Material
 var inspection_visibility: Dictionary = {}
+var snow_positions := PackedVector3Array()
+var snow_scales := PackedFloat32Array()
+var current_water := Vector3.ZERO
+var water_material: ShaderMaterial
+var sediment: CPUParticles3D
+var sway_enabled := true
+var view_yaw := 0.0
+var view_pitch := -0.12
+var view_roll := 0.0
+var flow_audio: AudioStreamPlayer
 
 func set_inspection_mode(enabled: bool) -> void:
 	if enabled:
@@ -58,6 +69,9 @@ func set_inspection_mode(enabled: bool) -> void:
 
 func _ready() -> void:
 	progress.load_game()
+	var settings := ConfigFile.new()
+	if settings.load("user://comfort.cfg") == OK:
+		sway_enabled = bool(settings.get_value("display", "sway", true))
 	records = JSON.parse_string(FileAccess.get_file_as_string("res://data/creatures.json"))
 	_setup_environment()
 	_setup_camera()
@@ -65,6 +79,7 @@ func _ready() -> void:
 	_setup_animals()
 	_setup_snow()
 	_setup_vent()
+	_setup_sediment()
 	_setup_audio()
 	hud = Hud.new(self)
 	add_child(hud)
@@ -118,9 +133,10 @@ func _setup_camera() -> void:
 	quad.size = Vector2(2, 2)
 	water.mesh = quad
 	water.extra_cull_margin = 16384
-	var water_material := ShaderMaterial.new()
+	water_material = ShaderMaterial.new()
 	water_material.shader = load("res://shaders/underwater.gdshader")
-	water_material.render_priority = 100
+	# Refraction reads opaque scenery first; translucent water particles draw after it.
+	water_material.render_priority = -100
 	water.material_override = water_material
 	camera.add_child(water)
 
@@ -151,22 +167,27 @@ func _setup_animals() -> void:
 
 func _setup_snow() -> void:
 	snow = MultiMeshInstance3D.new()
-	var mesh := SphereMesh.new()
-	mesh.radius = 0.025
-	mesh.height = 0.05
-	mesh.radial_segments = 4
-	mesh.rings = 2
-	mesh.material = Forms.material(Color("74a7b5"), 0.5)
+	var mesh := QuadMesh.new()
+	mesh.size = Vector2(0.045, 0.045)
+	var material := ShaderMaterial.new()
+	material.shader = load("res://shaders/marine_snow.gdshader")
+	mesh.material = material
 	var multi := MultiMesh.new()
 	multi.transform_format = MultiMesh.TRANSFORM_3D
+	multi.use_colors = true
 	multi.mesh = mesh
-	multi.instance_count = 700
+	multi.instance_count = 850
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 31
 	for i in range(multi.instance_count):
-		multi.set_instance_transform(i, Transform3D(Basis.IDENTITY, Vector3(rng.randf_range(-65, 65), rng.randf_range(-35, 35), rng.randf_range(-65, 65))))
+		var point := camera.position + Vector3(rng.randf_range(-22, 22), rng.randf_range(-14, 14), rng.randf_range(-22, 22))
+		var size := rng.randf_range(0.45, 1.6)
+		snow_positions.append(point)
+		snow_scales.append(size)
+		multi.set_instance_transform(i, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * size), point))
+		multi.set_instance_color(i, Color(1, 1, 1, rng.randf_range(0.35, 0.85)))
 	snow.multimesh = multi
-	snow.custom_aabb = AABB(Vector3(-70, -40, -70), Vector3(140, 80, 140))
+	snow.custom_aabb = AABB(camera.position - Vector3(24, 16, 24), Vector3(48, 32, 48))
 	add_child(snow)
 
 func _setup_vent() -> void:
@@ -174,6 +195,36 @@ func _setup_vent() -> void:
 	add_child(garden)
 	garden.build(generator)
 	seabed_material = garden.floor_material
+
+func _setup_sediment() -> void:
+	sediment = CPUParticles3D.new()
+	sediment.emitting = false
+	sediment.amount = 36
+	sediment.lifetime = 4.5
+	sediment.local_coords = false
+	sediment.direction = Vector3.UP
+	sediment.spread = 75
+	sediment.gravity = Vector3(0.07, 0.05, -0.02)
+	sediment.initial_velocity_min = 0.12
+	sediment.initial_velocity_max = 0.5
+	sediment.scale_amount_min = 0.3
+	sediment.scale_amount_max = 1.5
+	var curve := Curve.new()
+	curve.add_point(Vector2(0, 0.1))
+	curve.add_point(Vector2(0.4, 0.7))
+	curve.add_point(Vector2(1, 1))
+	sediment.scale_amount_curve = curve
+	var colors := Gradient.new()
+	colors.offsets = PackedFloat32Array([0.0, 0.15, 1.0])
+	colors.colors = PackedColorArray([Color(1,1,1,0), Color.WHITE, Color(1,1,1,0)])
+	sediment.color_ramp = colors
+	var quad := QuadMesh.new()
+	quad.size = Vector2(1.4, 1.4)
+	var material: ShaderMaterial = garden.particles[0].mesh.material.duplicate()
+	material.set_shader_parameter("tint", Color(0.14, 0.19, 0.20, 0.24))
+	quad.material = material
+	sediment.mesh = quad
+	add_child(sediment)
 
 func _setup_audio() -> void:
 	# Quiet synthesized ambience; it contains no third-party sound recordings.
@@ -193,14 +244,43 @@ func _setup_audio() -> void:
 	audio.stream = stream
 	audio.volume_db = -14
 	add_child(audio)
+	var wash := AudioStreamWAV.new()
+	wash.format = AudioStreamWAV.FORMAT_16_BITS
+	wash.mix_rate = 22050
+	wash.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	wash.loop_end = 22050 * 4
+	var wash_bytes := PackedByteArray()
+	wash_bytes.resize(wash.loop_end * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 92
+	var filtered := 0.0
+	for i in range(wash.loop_end):
+		filtered = filtered * 0.96 + rng.randf_range(-1, 1) * 0.04
+		var t := float(i) / wash.mix_rate
+		var envelope := smoothstep(0.0, 0.06, t) * (1.0 - smoothstep(3.94, 4.0, t))
+		wash_bytes.encode_s16(i * 2, int(filtered * envelope * 20000))
+	wash.data = wash_bytes
+	flow_audio = AudioStreamPlayer.new()
+	flow_audio.stream = wash
+	flow_audio.volume_db = -40
+	add_child(flow_audio)
 
 func toggle_audio() -> void:
 	audio_enabled = not audio_enabled
 	if audio_enabled:
 		audio.play()
+		flow_audio.play()
 	else:
 		audio.stop()
+		flow_audio.stop()
 	hud.sound_button.text = "SOUND ON" if audio_enabled else "SOUND OFF"
+
+func toggle_sway() -> void:
+	sway_enabled = not sway_enabled
+	hud.sway_button.text = "SWAY ON" if sway_enabled else "SWAY OFF"
+	var settings := ConfigFile.new()
+	settings.set_value("display", "sway", sway_enabled)
+	settings.save("user://comfort.cfg")
 
 func start_expedition() -> void:
 	if not started:
@@ -212,6 +292,10 @@ func _process(delta: float) -> void:
 	for animal in animals:
 		animal.animated = not hud.modal
 	garden.set_paused(hud.modal)
+	sediment.speed_scale = 0.0 if hud.modal else 1.0
+	if hud.modal:
+		sediment.emitting = false
+		flow_audio.volume_db = -44
 	if not hud.modal and started:
 		_move_player(delta)
 		_update_air(delta)
@@ -246,10 +330,15 @@ func _move_player(delta: float) -> void:
 	if Input.is_physical_key_pressed(KEY_C):
 		vertical -= 1
 	var direction := camera.basis * Vector3(input.x, 0, input.y) + Vector3.UP * vertical
-	var speed := 14.0 if Input.is_physical_key_pressed(KEY_SHIFT) else 8.0
-	velocity = velocity.lerp(direction.limit_length() * speed, 1.0 - exp(-3.0 * delta))
-	var next := camera.position + velocity * delta
-	next.y = clampf(next.y, generator.height_at(next.x, next.z) + 2.0, 50.0)
+	var dt := minf(delta, 0.2)
+	current_water = WaterMotion.current_at(camera.position, elapsed)
+	velocity = WaterMotion.advance(velocity, direction, current_water, dt, Input.is_physical_key_pressed(KEY_SHIFT))
+	var next := camera.position + velocity * dt
+	var floor_height := generator.height_at(next.x, next.z) + 2.0
+	if next.y < floor_height:
+		next.y = floor_height
+		velocity.y = maxf(0.0, velocity.y)
+	next.y = minf(next.y, 50.0)
 	# Capsule collision volumes; terrain collision uses the generator's height field.
 	for pod in village.get_children():
 		if not pod is Node3D or not pod.get_child_count() > 5:
@@ -258,10 +347,34 @@ func _move_player(delta: float) -> void:
 		if local.length() < 1.0:
 			next = pod.position + local.normalized() * Vector3(5.3, 3.5, 4.1)
 	camera.position = next
-	camera.rotation = Vector3(pitch, yaw, sin(elapsed * 0.8) * 0.002)
+	if sway_enabled:
+		view_yaw = lerp_angle(view_yaw, yaw, 1.0 - exp(-9.0 * dt))
+		view_pitch = lerpf(view_pitch, pitch, 1.0 - exp(-9.0 * dt))
+		var bank := clampf(-input.x * 0.014 - wrapf(yaw - view_yaw, -PI, PI) * 0.04, -0.025, 0.025)
+		view_roll = lerpf(view_roll, bank + sin(elapsed * 0.65) * 0.0015, 1.0 - exp(-2.5 * dt))
+	else:
+		view_yaw = yaw
+		view_pitch = pitch
+		view_roll = 0.0
+	camera.rotation = Vector3(view_pitch, view_yaw, view_roll)
+	var relative_speed := (velocity - current_water).length()
+	camera.fov = lerpf(camera.fov, 66.0 + minf(relative_speed / 8.0, 1.0) * 1.4 if sway_enabled else 66.0, 1.0 - exp(-2.0 * dt))
+	water_material.set_shader_parameter("swim_speed", relative_speed)
+	water_material.set_shader_parameter("motion_amount", 1.0 if sway_enabled else 0.0)
+	water_material.set_shader_parameter("thermal_amount", exp(-Vector2(next.x + 16.0, next.z + 29.0).length_squared() / 500.0))
+	flow_audio.volume_db = lerpf(flow_audio.volume_db, -42.0 + minf(relative_speed / 8.0, 1.0) * 19.0, 1.0 - exp(-2.0 * dt))
+	sediment.position = Vector3(next.x, floor_height - 1.7, next.z)
+	sediment.emitting = next.y - floor_height < 1.2 and relative_speed > 1.5
 
 func _animate_world(_delta: float) -> void:
-	snow.position = camera.position + Vector3(sin(elapsed * 0.1) * 3, fmod(-elapsed * 0.09, 2), 0)
+	for i in range(snow_positions.size()):
+		var point := snow_positions[i]
+		point += (WaterMotion.current_at(point, elapsed) + Vector3(0, -0.035, 0)) * minf(_delta, 0.2)
+		var relative := point - camera.position
+		point = camera.position + Vector3(wrapf(relative.x, -22, 22), wrapf(relative.y, -14, 14), wrapf(relative.z, -22, 22))
+		snow_positions[i] = point
+		snow.multimesh.set_instance_transform(i, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * snow_scales[i]), point))
+	snow.custom_aabb = AABB(camera.position - Vector3(24, 16, 24), Vector3(48, 32, 48))
 	for i in range(smoke.size()):
 		var puff := smoke[i]
 		var origin: Vector3 = puff.get_meta("origin")
@@ -447,6 +560,9 @@ func recall_home() -> void:
 	velocity = Vector3.ZERO
 	yaw = 0
 	pitch = -0.12
+	view_yaw = yaw
+	view_pitch = pitch
+	view_roll = 0
 	air = MAX_AIR
 	_refresh_chunks()
 	_save()

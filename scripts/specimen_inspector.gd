@@ -21,6 +21,9 @@ var reviewed: Array[String] = []
 var turned_by_user := false
 var auto_rotate := false
 var record: Dictionary
+var scan_shells: Array[MeshInstance3D] = []
+var scan_enabled := false
+var scan_button: Button
 
 func _ready() -> void:
 	record = JSON.parse_string(FileAccess.get_file_as_string("res://data/specimens.json")).riftia
@@ -33,7 +36,13 @@ func _ready() -> void:
 	header.text = "SPECIMEN 01    /    RIFTIA PACHYPTILA"
 	header.add_theme_color_override("font_color", Color("8fd2c9"))
 	header.add_theme_font_size_override("font_size", 14)
-	left.add_child(header)
+	var scan_bar := HBoxContainer.new()
+	header.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scan_bar.add_child(header)
+	scan_button = _button("SCAN LAYER: OFF", toggle_scan)
+	scan_button.size_flags_horizontal = Control.SIZE_SHRINK_END
+	scan_bar.add_child(scan_button)
+	left.add_child(scan_bar)
 	stage = SubViewportContainer.new()
 	stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	stage.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -63,6 +72,7 @@ func _ready() -> void:
 	var model := Garden.make_specimen()
 	model.position.y = -1.5
 	pivot.add_child(model)
+	_add_scan_shells(model)
 	view_camera = Camera3D.new()
 	view_camera.fov = 37
 	view_camera.near = 0.02
@@ -120,6 +130,33 @@ func _ready() -> void:
 	right.add_child(_button("SCIENTIFIC REFERENCE", func(): OS.shell_open(record.source)))
 	side.add_child(_button("BACK TO THE VENT GARDEN", func(): closed.emit()))
 	show_feature("whole")
+
+func _add_scan_shells(node: Node) -> void:
+	var original_children := node.get_children()
+	if node is MeshInstance3D:
+		var shell := MeshInstance3D.new()
+		shell.name = "InstrumentScanShell"
+		shell.mesh = node.mesh
+		shell.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var mat := ShaderMaterial.new()
+		mat.shader = load("res://shaders/hologram.gdshader")
+		var is_plume := "plume" in node.name.to_lower() or "pinnules" in node.name.to_lower()
+		mat.set_shader_parameter("plume", 1.0 if is_plume else 0.0)
+		shell.material_override = mat
+		shell.visible = false
+		node.add_child(shell)
+		scan_shells.append(shell)
+	for child in original_children:
+		_add_scan_shells(child)
+
+func toggle_scan() -> void:
+	scan_enabled = not scan_enabled
+	for shell in scan_shells:
+		shell.visible = scan_enabled
+	scan_button.text = "SCAN LAYER: ON" if scan_enabled else "SCAN LAYER: OFF"
+	scale_label.text = "Drag to orbit  ·  Pinch or scroll to zoom  ·  Illustrative proportions"
+	if scan_enabled:
+		scale_label.text += "\nHolographic instrument overlay · not natural bioluminescence"
 
 func _button(text: String, action: Callable) -> Button:
 	var button := Button.new()

@@ -17,6 +17,7 @@ var toast_label: Label
 var interact_button: Button
 var build_button: Button
 var sound_button: Button
+var sway_button: Button
 var pad: Control
 var overlay: PanelContainer
 var overlay_content: VBoxContainer
@@ -52,9 +53,11 @@ func _ready() -> void:
 	_place(right, Vector2(-340, 26), Vector2(310, 150), Control.PRESET_TOP_RIGHT)
 	var actions := HBoxContainer.new()
 	right.add_child(actions)
-	actions.add_child(_button("FIELD JOURNAL  [J]", show_journal))
+	actions.add_child(_button("JOURNAL [J]", show_journal))
 	sound_button = _button("SOUND OFF", func(): game.toggle_audio())
 	actions.add_child(sound_button)
+	sway_button = _button("SWAY ON" if game.sway_enabled else "SWAY OFF", func(): game.toggle_sway())
+	actions.add_child(sway_button)
 	right.add_child(_button("SPECIMEN 01 · EXAMINE IN 3D", show_specimen))
 	oxygen_label = _label("LIFE SUPPORT  ·  100%", 14)
 	right.add_child(oxygen_label)
@@ -176,12 +179,12 @@ func _paragraph(text: String, color: Color = INK) -> void:
 func show_welcome() -> void:
 	_open_modal()
 	overlay.add_theme_stylebox_override("panel", _style(Color(0.005, 0.025, 0.04, 0.72), 0))
-	overlay_content.add_child(_label("VISUAL STUDY 02  /  THE VENT GARDEN", 14, MINT))
+	overlay_content.add_child(_label("STUDY 03  /  WATER & LIGHT", 14, MINT))
 	overlay_content.add_child(_label("A World Below", 58))
 	_paragraph("Life at the edge of the impossible.")
 	_paragraph("Descend into a compact hydrothermal habitat. Examine a giant tubeworm in full 3D and discover the bacterial partnership that sustains it.")
 	_paragraph("DISCOVER  /  EXAMINE  /  UNDERSTAND  /  INVENT", MINT)
-	_paragraph("iPad: left pad to swim, drag open water to look, RISE / DIVE to change depth.\nIn the specimen viewer: drag to orbit, pinch or use the zoom buttons.")
+	_paragraph("Feel the current and coast between strokes. Watch suspended particles drift past.\niPad: left pad to swim, drag to look, RISE / DIVE for depth. SWAY OFF reduces camera motion.\nIn the specimen viewer: rotate, zoom, and compare the optional holographic SCAN LAYER.")
 	overlay_content.add_child(_button("ENTER THE VENT GARDEN", close_modal))
 	overlay_content.add_child(_button("EXAMINE THE TUBEWORM · FULL 3D", show_specimen))
 	overlay_content.add_child(_button("TOOLS & CREDITS", show_credits))
