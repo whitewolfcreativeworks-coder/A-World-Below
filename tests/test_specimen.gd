@@ -27,9 +27,17 @@ func run() -> void:
 	check(meshes.size() >= 4, "Specimen needs tube, interior, collar and respiratory geometry")
 	var vertex_count := 0
 	for mesh in meshes:
+		if mesh.name == "InstrumentScanShell":
+			continue
 		for surface in range(mesh.mesh.get_surface_count()):
 			vertex_count += mesh.mesh.surface_get_array_len(surface)
 	check(vertex_count > 10000, "Detailed specimen geometry must load, not a placeholder primitive")
+	check(not inspector.scan_enabled and not inspector.scan_shells[0].visible, "Natural view must be the default")
+	inspector.toggle_scan()
+	check(inspector.scan_enabled and inspector.scan_shells[0].visible, "Scan toggle must enable the holographic shell")
+	check(inspector.scale_label.text.contains("not natural bioluminescence"), "Scan glow must be identified as an instrument effect")
+	inspector.toggle_scan()
+	check(not inspector.scan_shells[0].visible, "Scan overlay must switch off without changing anatomy")
 	inspector.show_feature("plume")
 	check(inspector.distance < 2.0 and inspector.focus.y > 1.0, "Plume view must frame the respiratory structures")
 	var old_angle: float = inspector.angle

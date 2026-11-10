@@ -5,6 +5,20 @@ Search for extremophiles and unusual organisms, examine their adaptations in
 3D, and develop research-inspired technology for an underwater village. Visual
 detail is the priority; the generated world grows around that experience.
 
+## Water & Light study
+
+Swimming now responds to currents, thrust, and water-relative drag. Nearby
+particles drift independently of the camera, and fast movement near the floor
+stirs sediment. Try SOUND ON for the movement-responsive wash; SWAY OFF reduces
+camera motion and optical shimmer.
+
+In **SPECIMEN 01**, toggle **SCAN LAYER** for a holographic research shell with
+contour highlights and a slow sweep. It is identified as an instrument effect;
+the organism's natural appearance remains the default. See
+[water and scan notes](docs/WATER_AND_SCAN.md).
+
+![Holographic research layer](docs/holographic-scan.jpg)
+
 ## Vent Garden visual study
 
 The current build focuses on a compact vent habitat and a detailed, rotatable
@@ -105,6 +119,8 @@ Checks cover seed repeatability, chunk seams, depletion after revisiting,
 scanning, cargo limits, building, rescue, modal pause, and saving.
 `tests/test_specimen.gd` also checks that detailed 3D geometry loads, anatomy
 views frame correctly, orbit works, and inspection preserves expedition state.
+`tests/test_water.gd` checks drag, coasting, current entrainment, frame-rate
+consistency, world-anchored particles, and the saved comfort preference.
 
 Optional browser smoke check (requires a local Playwright installation):
 `node tools/test_browser.cjs`. Set `CHROMIUM_PATH` if using a system browser.
