@@ -1,0 +1,35 @@
+[
+  {
+    "id": "atolla",
+    "name": "Atolla jelly",
+    "scientific": "Atolla spp.",
+    "habitat": "Midwater · deep pelagic ocean",
+    "fact": "Some Atolla jellies produce a flashing display when disturbed. The display is thought to attract a larger predator that may attack the jelly's attacker: a burglar-alarm defense.",
+    "observe": "Watch the bell contract and the trailing tentacles. The colored glow in this prototype is an artistic interpretation, not its everyday appearance.",
+    "source": "https://www.mbari.org/animal/deep-sea-crown-jelly/",
+    "model": "jelly",
+    "color": "e68b72"
+  },
+  {
+    "id": "dumbo",
+    "name": "Dumbo octopus",
+    "scientific": "Grimpoteuthis spp.",
+    "habitat": "Deep ocean · often near the seafloor",
+    "fact": "Dumbo octopuses are named for the ear-like fins on their mantle. They use those fins and their webbed arms to move through the water. Different species occupy different depths.",
+    "observe": "Look for the paired fins and the web between the arms. Our simplified model exaggerates their silhouette; its glow is artistic.",
+    "source": "https://oceantoday.noaa.gov/dumbooctopus/",
+    "model": "dumbo",
+    "color": "c9a7df"
+  },
+  {
+    "id": "isopod",
+    "name": "Giant isopod",
+    "scientific": "Bathynomus spp.",
+    "habitat": "Seafloor · scavenger",
+    "fact": "Giant isopods are crustaceans related to the woodlice found on land. They scavenge food that reaches the seafloor. Species differ in size and geographic range.",
+    "observe": "Observe the segmented body, antennae, and legs. Food can be scarce in the deep sea; a scavenger must take opportunities when they arrive.",
+    "source": "https://oceanexplorer.noaa.gov/ocean-fact/isopod/",
+    "model": "isopod",
+    "color": "c7b89b"
+  }
+]

@@ -1,0 +1,52 @@
+extends Control
+## One captured touch drives swimming. Other touches remain available to look.
+var axis := Vector2.ZERO
+var finger := -1
+var knob := Vector2.ZERO
+
+func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	knob = size * 0.5
+
+func _gui_input(event: InputEvent) -> void:
+	if event.device == InputEvent.DEVICE_ID_EMULATION:
+		return
+	if event is InputEventScreenTouch:
+		if event.pressed and finger == -1:
+			finger = event.index
+			_update_axis(event.position)
+		elif not event.pressed and event.index == finger:
+			reset()
+		accept_event()
+	elif event is InputEventScreenDrag and event.index == finger:
+		_update_axis(event.position)
+		accept_event()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			finger = -2
+			_update_axis(event.position)
+		else:
+			reset()
+		accept_event()
+	elif event is InputEventMouseMotion and finger == -2:
+		_update_axis(event.position)
+		accept_event()
+
+func _update_axis(point: Vector2) -> void:
+	axis = ((point - size * 0.5) / 54.0).limit_length(1.0)
+	knob = size * 0.5 + axis * 45.0
+	queue_redraw()
+
+func reset() -> void:
+	finger = -1
+	axis = Vector2.ZERO
+	knob = size * 0.5
+	queue_redraw()
+
+func _draw() -> void:
+	var center := size * 0.5
+	draw_circle(center, 68, Color(0.02, 0.12, 0.16, 0.55))
+	draw_arc(center, 68, 0, TAU, 64, Color(0.42, 0.73, 0.73, 0.5), 1.0, true)
+	draw_line(center - Vector2(48, 0), center + Vector2(48, 0), Color(0.5, 0.8, 0.8, 0.15))
+	draw_line(center - Vector2(0, 48), center + Vector2(0, 48), Color(0.5, 0.8, 0.8, 0.15))
+	draw_circle(knob, 24, Color(0.4, 0.8, 0.75, 0.55))
