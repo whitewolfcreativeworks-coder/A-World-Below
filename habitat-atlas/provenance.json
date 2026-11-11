@@ -1,0 +1,172 @@
+[
+  {
+    "id": "vent",
+    "page": "https://oceanexplorer.noaa.gov/multimedia/daily-image-media-20210304/",
+    "download_url": "https://oceanexplorer.noaa.gov/wp-content/uploads/2021/02/20210304-hires.jpg",
+    "original_sha256": "d77ca3d4fa1bc17650a97f6113c673d6dcb1ddcde14413c46f1ea9c6837306cd",
+    "original_dimensions": [
+      1920,
+      1080
+    ],
+    "file": "images/vent.jpg",
+    "sha256": "1ea87dcfd9e87a03a554f877694a9f62ef9877100a08ab4aaea1982396d2dcaa",
+    "changes": "Resized to fit 1280 x 960 and re-encoded JPEG; no content edits",
+    "retrieved": "2026-11-11",
+    "credit": "NOAA Ocean Exploration, 2016 Deepwater Exploration of the Marianas",
+    "license": "Public domain — U.S. federal government work",
+    "license_url": "https://oceanexplorer.noaa.gov/about/media-kit/"
+  },
+  {
+    "id": "seep",
+    "page": "https://oceanexplorer.noaa.gov/multimedia/okeanos-explorations-ex1903-background-seeps-media-mound/",
+    "download_url": "https://oceanexplorer.noaa.gov/wp-content/uploads/2025/04/mound-hires-2.jpg",
+    "original_sha256": "d144ed768a2a91632bd2f316198f6375489ba568b94fa269d33ee4e983cbf51b",
+    "original_dimensions": [
+      1920,
+      1080
+    ],
+    "file": "images/seep.jpg",
+    "sha256": "5d337c5190577b18517b1f5421fcf54fb5dab74882226587a5327a911aba8116",
+    "changes": "Resized to fit 1280 x 960 and re-encoded JPEG; no content edits",
+    "retrieved": "2026-11-11",
+    "credit": "NOAA Office of Ocean Exploration and Research",
+    "license": "Public domain — U.S. federal government work",
+    "license_url": "https://oceanexplorer.noaa.gov/about/media-kit/"
+  },
+  {
+    "id": "coral",
+    "page": "https://oceanexplorer.noaa.gov/multimedia/coral-and-sponge-community/",
+    "download_url": "https://oceanexplorer.noaa.gov/wp-content/uploads/2025/08/dive16-coral-sponge.jpg",
+    "original_sha256": "234e6ea6603cdc25d62cab2fc9e36cc4fdd98d0284409839b68b823c19113926",
+    "original_dimensions": [
+      1920,
+      1080
+    ],
+    "file": "images/coral.jpg",
+    "sha256": "39e1c3283d9d4a6b6e03ad2ab2a1adb9da1c9715f801e7f3bf5109c0f922b919",
+    "changes": "Resized to fit 1280 x 960 and re-encoded JPEG; no content edits",
+    "retrieved": "2026-11-11",
+    "credit": "NOAA Ocean Exploration, 2025 Beyond the Blue",
+    "license": "Public domain — U.S. federal government work",
+    "license_url": "https://oceanexplorer.noaa.gov/about/media-kit/"
+  },
+  {
+    "id": "sponge",
+    "page": "https://oceanexplorer.noaa.gov/multimedia/okeanos-explorations-ex2104-dives-dive08-media-sponge-garden/",
+    "download_url": "https://oceanexplorer.noaa.gov/wp-content/uploads/2025/05/sponge-garden-hires.jpg",
+    "original_sha256": "cb615e79fbc25a27ab042b4971b1fd66b5f3fb87a0686d277c4be79063ababf4",
+    "original_dimensions": [
+      1920,
+      1080
+    ],
+    "file": "images/sponge.jpg",
+    "sha256": "61229175b03588ac2cc1e6a5ddece67b2ca5e7a35f5884c430fefdee815a0793",
+    "changes": "Resized to fit 1280 x 960 and re-encoded JPEG; no content edits",
+    "retrieved": "2026-11-11",
+    "credit": "NOAA Ocean Exploration, 2021 North Atlantic Stepping Stones",
+    "license": "Public domain — U.S. federal government work",
+    "license_url": "https://oceanexplorer.noaa.gov/about/media-kit/"
+  },
+  {
+    "id": "nodules",
+    "page": "https://oceanexplorer.noaa.gov/multimedia/seafloor/",
+    "download_url": "https://oceanexplorer.noaa.gov/wp-content/uploads/2026/08/ex2605-dive08-seafloor.jpg",
+    "original_sha256": "2a7eab69faedfd2b9673cb2958f7be3afd4d6a92c2358d8e17828b8061634428",
+    "original_dimensions": [
+      1920,
+      1280
+    ],
+    "file": "images/nodules.jpg",
+    "sha256": "657bfbe5532e24f3ccd74c92fbf0e2c225e0c70db9a68e2f6923632132a14d9d",
+    "changes": "Resized to fit 1280 x 960 and re-encoded JPEG; no content edits",
+    "retrieved": "2026-11-11",
+    "credit": "NOAA Ocean Exploration, 2026 Cook Islands ROV Exploration",
+    "license": "Public domain — U.S. federal government work",
+    "license_url": "https://oceanexplorer.noaa.gov/about/media-kit/"
+  },
+  {
+    "id": "canyon",
+    "page": "https://oceanexplorer.noaa.gov/multimedia/okeanos-explorations-ex1905-background-connectivity-media-img2/",
+    "download_url": "https://oceanexplorer.noaa.gov/wp-content/uploads/2025/04/img2-hires-23.jpg",
+    "original_sha256": "f81673f03aae67b44d939e727a52e9cbdca9d13b013a8972f81f47dfc59e8e7d",
+    "original_dimensions": [
+      1920,
+      1080
+    ],
+    "file": "images/canyon.jpg",
+    "sha256": "84e75e73b0850234c495a3f06325d0c78ac4bf9991abd78f2c250b5787640799",
+    "changes": "Resized to fit 1280 x 960 and re-encoded JPEG; no content edits",
+    "retrieved": "2026-11-11",
+    "credit": "NOAA Ocean Exploration, Exploring Atlantic Canyons and Seamounts 2014",
+    "license": "Public domain — U.S. federal government work",
+    "license_url": "https://oceanexplorer.noaa.gov/about/media-kit/"
+  },
+  {
+    "id": "bubbles",
+    "page": "https://oceanexplorer.noaa.gov/multimedia/okeanos-explorations-seascape-alaska-ex2306-gallery-media-dive14-cold-seep/",
+    "download_url": "https://oceanexplorer.noaa.gov/wp-content/uploads/2023/10/dive14-cold-seep-hires.jpg",
+    "original_sha256": "ac04551dadc3b29393663f2e0e6e5822b0571d30c8be343eff476a54ec697fe8",
+    "original_dimensions": [
+      4337,
+      2840
+    ],
+    "file": "images/bubbles.jpg",
+    "sha256": "da0ef2a71b8bab09067f505028ac355acaa1b0184e966c7bbd9c0d073b00d8db",
+    "changes": "Resized to fit 1280 x 960 and re-encoded JPEG; no content edits",
+    "retrieved": "2026-11-11",
+    "credit": "NOAA Ocean Exploration, Seascape Alaska",
+    "license": "Public domain — U.S. federal government work",
+    "license_url": "https://oceanexplorer.noaa.gov/about/media-kit/"
+  },
+  {
+    "id": "brine",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/8/89/2018_Gulf_of_Mexico_Brine_Pool.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:2018_Gulf_of_Mexico_Brine_Pool.jpg",
+    "credit": "NOAA Office of Ocean Exploration and Research",
+    "original_dimensions": [
+      1920,
+      1080
+    ],
+    "original_sha256": "cd7b9a983846d10858b0635b23bceeab3fd7ccb73c13cfe66504f03f435ad960",
+    "sha256": "cbc1a5fca1e3e07620260344089dadccf68e14ee9d824f437ecb121467a21848",
+    "file": "images/brine.jpg",
+    "changes": "Resized and re-encoded JPEG; no content edits",
+    "retrieved": "2026-11-11",
+    "license": "Public domain — U.S. federal government work",
+    "license_url": "https://commons.wikimedia.org/wiki/Template:PD-USGov-NOAA"
+  },
+  {
+    "id": "whale",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Whale_fall.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Whale_fall.jpg",
+    "credit": "NOAA Undersea Research Program",
+    "original_dimensions": [
+      483,
+      328
+    ],
+    "original_sha256": "8c79c70dd30c33ee13924a2afd781d5551248863237eeaeedde3d627ab6459c9",
+    "sha256": "18a682b83df882bd54cead07163dc8da2035ff8f03f5d42de0fd6af5313a9e60",
+    "file": "images/whale.jpg",
+    "changes": "Resized and re-encoded JPEG; no content edits",
+    "retrieved": "2026-11-11",
+    "license": "Public domain — U.S. federal government work",
+    "license_url": "https://commons.wikimedia.org/wiki/Template:PD-USGov-NOAA"
+  },
+  {
+    "id": "hadal",
+    "download_url": "https://www.frontiersin.org/files/Articles/856992/xml-images/fmars-09-856992-g004.webp",
+    "page": "https://doi.org/10.3389/fmars.2022.856992",
+    "credit": "Jamieson AJ, Stewart HA, Weston JNJ, Lahey P & Vescovo VL (2022), Frontiers in Marine Science 9:856992, Figure 4",
+    "original_dimensions": [
+      1655,
+      1730
+    ],
+    "original_sha256": "41aa6985bae55c4f3c1749dafde332395d41ff0ec6983f5810c2d1fbb0204093",
+    "sha256": "e89e506fb7f23ea92b3a174ce33873af946364a0b449b90e11be08ecd00a1e56",
+    "file": "images/hadal.jpg",
+    "changes": "Resized and re-encoded JPEG; no content edits",
+    "retrieved": "2026-11-11",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  }
+]
