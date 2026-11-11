@@ -14,8 +14,9 @@ Godot's copyright inventory comes from the exact engine release. It records
 bundled libraries and notices; not every listed library is active in the Web
 runtime. In-game credits also link Godot's official license page.
 
-Scientific sources are references, not shipped photographs, videos, models,
-database dumps, or copied descriptions. Journal text is original paraphrase.
+Scientific sources inform original paraphrased journal text. One licensed
+scientific micrograph is bundled, as documented below. No database dumps or
+scientific video are bundled.
 NOAA and MBARI have not endorsed or reviewed this game.
 
 The Poly Haven material is a bare-rock visual reference, not photographic data
@@ -28,3 +29,26 @@ license permitting a compiled commercial game may restrict source distribution.
 
 Development automation uses official GitHub actions and Python's standard library.
 Playwright is optional browser-test tooling, not a runtime dependency.
+
+## Vent microbial microscopy — CC BY 4.0
+
+`assets/science/vent_microbes.webp`: Aurélien Lecoeuvre, Bénédicte Ménez,
+Mathilde Cannat, Valérie Chavagnac & Emmanuelle Gérard (2020), confocal microscopy
+of chimney samples from the Old City hydrothermal field. From
+[the primary paper](https://www.nature.com/articles/s41396-020-00816-7), via
+[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Confocal_laser_scanning_microscopy_images_showing_different_microbial_morphotyes_in_chimney_samples.webp).
+[Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/)
+permits commercial reuse and redistribution with attribution, a license link,
+and identification of changes. Original image unchanged, scaled for display.
+Exact URL and checksum are in `assets/science/provenance.json`, copied to Web
+package notices. Imaging colors are not natural visible bioluminescence.
+The primary paper identifies Old City; the Commons location description differs.
+
+## Original music and habitat forms
+
+Four 32-second looping cues are original project compositions under MIT:
+underwater ambient, electronic drift, downtempo and quiet piano. The reproducible
+offline renderer is `tools/compose_music.py` (NumPy and ffmpeg are production tools,
+not game dependencies). No third-party recordings or sample libraries are used.
+Coral, sponge, microbial mat and moving crustacean silhouettes are original
+representative forms, not scans or identified species reconstructions.

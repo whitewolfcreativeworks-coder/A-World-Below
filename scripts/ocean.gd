@@ -8,6 +8,9 @@ const Hud = preload("res://scripts/hud.gd")
 const VentGarden = preload("res://scripts/vent_garden.gd")
 const WaterMotion = preload("res://scripts/water_motion.gd")
 const TouchControls = preload("res://scripts/touch_controls.gd")
+const HabitatLife = preload("res://scripts/habitat_life.gd")
+const MUSIC_NAMES := ["Underwater ambient", "Electronic drift", "Downtempo", "Quiet piano"]
+const MUSIC_FILES := ["ambient", "electronic", "downtempo", "piano"]
 const MAX_AIR := 300.0
 const HOME := Vector3(19, -5, 4)
 const SPAWN := Vector3(-13, -7, -1)
@@ -39,6 +42,10 @@ var touch_buttons: Dictionary = {}
 var lamp: SpotLight3D
 var audio: AudioStreamPlayer
 var audio_enabled := false
+var music_index := 0
+var music_volume := 0.65
+var habitat: Node3D
+var music_revision := 0
 var chunk_queue: Array[Vector2i] = []
 var last_chunk := Vector2i(99999, 99999)
 var garden: Node3D
@@ -81,6 +88,9 @@ func _ready() -> void:
 	_setup_animals()
 	_setup_snow()
 	_setup_vent()
+	habitat = HabitatLife.new()
+	add_child(habitat)
+	habitat.build(generator)
 	_setup_sediment()
 	_setup_audio()
 	hud = Hud.new(self)
@@ -160,7 +170,7 @@ func _add_capsule(index: int) -> void:
 	Forms.tube(village, HOME, point, 0.7, Forms.material(Color("1c454e"), 0.0, 0.5))
 
 func _setup_animals() -> void:
-	var positions := [Vector3(18, 3, -75), Vector3(34, -3, -65), Vector3(4, generator.height_at(4, -45) + 0.5, -45)]
+	var positions := [Vector3(-5, -3, -26), Vector3(7, -5, -35), Vector3(4, generator.height_at(4, -24) + 0.5, -24)]
 	for i in range(records.size()):
 		var animal := Creature.new()
 		add_child(animal)
@@ -230,22 +240,10 @@ func _setup_sediment() -> void:
 	add_child(sediment)
 
 func _setup_audio() -> void:
-	# Quiet synthesized ambience; it contains no third-party sound recordings.
-	var stream := AudioStreamWAV.new()
-	stream.format = AudioStreamWAV.FORMAT_16_BITS
-	stream.mix_rate = 22050
-	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-	stream.loop_end = 22050 * 8
-	var bytes := PackedByteArray()
-	bytes.resize(stream.loop_end * 2)
-	for i in range(stream.loop_end):
-		var t := float(i) / stream.mix_rate
-		var sample := (sin(TAU * 55 * t) * 0.07 + sin(TAU * 82.5 * t) * 0.025 + sin(TAU * 110 * t) * 0.018) * (0.8 + 0.2 * sin(TAU * t / 8))
-		bytes.encode_s16(i * 2, int(sample * 32767))
-	stream.data = bytes
+	# Original offline-rendered cues, no streaming service or runtime synthesis cost.
 	audio = AudioStreamPlayer.new()
-	audio.stream = stream
-	audio.volume_db = -14
+	audio.stream = _music_stream(0)
+	audio.volume_db = linear_to_db(music_volume) - 10.0
 	add_child(audio)
 	var wash := AudioStreamWAV.new()
 	wash.format = AudioStreamWAV.FORMAT_16_BITS
@@ -268,6 +266,35 @@ func _setup_audio() -> void:
 	flow_audio.volume_db = -40
 	add_child(flow_audio)
 
+func _music_stream(index: int) -> AudioStreamOggVorbis:
+	var stream: AudioStreamOggVorbis = load("res://assets/audio/%s.ogg" % MUSIC_FILES[index])
+	stream.loop = true
+	return stream
+
+func select_music(index: int) -> void:
+	if index < 0 or index >= MUSIC_NAMES.size():
+		return
+	music_index = index
+	music_revision += 1
+	var revision := music_revision
+	# Fade the old cue before switching, avoiding hard waveform cuts.
+	var fade := create_tween()
+	fade.tween_property(audio, "volume_db", -60.0, 0.25)
+	await fade.finished
+	if revision != music_revision:
+		return
+	audio.stream = _music_stream(index)
+	if not audio_enabled:
+		toggle_audio()
+	else:
+		audio.play()
+	create_tween().tween_property(audio,"volume_db",linear_to_db(maxf(music_volume,0.001))-10,0.6)
+	hud.refresh_music()
+
+func set_music_volume(value: float) -> void:
+	music_volume = clampf(value,0.0,1.0)
+	audio.volume_db = linear_to_db(maxf(music_volume,0.001))-10
+
 func toggle_audio() -> void:
 	audio_enabled = not audio_enabled
 	if audio_enabled:
@@ -277,6 +304,16 @@ func toggle_audio() -> void:
 		audio.stop()
 		flow_audio.stop()
 	hud.sound_button.text = "SOUND ON" if audio_enabled else "SOUND OFF"
+
+func life_contacts() -> Array[Vector3]:
+	var contacts: Array[Vector3] = []
+	for animal in animals:
+		contacts.append(animal.global_position)
+	if is_instance_valid(garden) and is_instance_valid(garden.specimen):
+		contacts.append(garden.specimen.global_position)
+	if is_instance_valid(habitat):
+		contacts.append_array(habitat.colony_positions)
+	return contacts
 
 func toggle_sway() -> void:
 	sway_enabled = not sway_enabled
@@ -288,6 +325,8 @@ func toggle_sway() -> void:
 func start_expedition() -> void:
 	if not started:
 		started = true
+		if not audio_enabled:
+			toggle_audio()
 		hud.toast("Vent Garden · Look for the crimson tubeworm colony. Tap SPECIMEN to examine its anatomy.")
 
 func _process(delta: float) -> void:
@@ -295,6 +334,7 @@ func _process(delta: float) -> void:
 	for animal in animals:
 		animal.animated = not hud.modal
 	garden.set_paused(hud.modal)
+	habitat.paused = hud.modal
 	sediment.speed_scale = 0.0 if hud.modal else 1.0
 	if hud.modal:
 		sediment.emitting = false
@@ -453,7 +493,7 @@ func _create_chunk(chunk: Vector2i) -> void:
 	root.add_child(terrain)
 	var rng := generator.rng_for(chunk)
 	var stone: Material = garden.rock_material
-	for i in range(9):
+	for i in range(16):
 		var x := (chunk.x + rng.randf()) * generator.CHUNK_SIZE
 		var z := (chunk.y + rng.randf()) * generator.CHUNK_SIZE
 		if Vector2(x, z).length() < 17:

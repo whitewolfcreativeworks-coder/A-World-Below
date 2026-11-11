@@ -1,0 +1,86 @@
+[
+  {
+    "title": "MIDWATER ANIMALS",
+    "description": "Animals suspended in the water column. Many are gelatinous; some produce bioluminescent signals.",
+    "entries": [
+      {
+        "name": "Atolla jellies",
+        "status": "Stylized model in game",
+        "note": "Bell pulses and trailing tentacles; prototype glow is artistic.",
+        "source": "https://www.mbari.org/animal/deep-sea-crown-jelly/"
+      }
+    ]
+  },
+  {
+    "title": "SEAFLOOR ANIMALS",
+    "description": "Mobile animals living on or near the bottom. These are not automatically heat-loving extremophiles.",
+    "entries": [
+      {
+        "name": "Dumbo octopuses",
+        "status": "Stylized model in game",
+        "note": "Fin-assisted swimming; species occupy different depth ranges.",
+        "source": "https://oceantoday.noaa.gov/dumbooctopus/"
+      },
+      {
+        "name": "Giant isopods",
+        "status": "Stylized model in game",
+        "note": "Crustacean scavengers; geographic range and depth vary by species.",
+        "source": "https://oceanexplorer.noaa.gov/ocean-fact/isopod/"
+      }
+    ]
+  },
+  {
+    "title": "COLD-WATER HABITAT BUILDERS",
+    "description": "Corals and sponges provide structure on suitable cooler substrates, away from hot vent discharge.",
+    "entries": [
+      {
+        "name": "Deep-sea corals and sponges",
+        "status": "Representative scenery",
+        "note": "Authored branching/cup forms, not identified species or photo-derived skins.",
+        "source": "https://oceanexplorer.noaa.gov/ocean-fact/coral-animal/"
+      }
+    ]
+  },
+  {
+    "title": "VENT ANIMALS AND SYMBIOSIS",
+    "description": "Animals around mixed vent waters may rely on microbial partners. They do not live in undiluted superheated fluid.",
+    "entries": [
+      {
+        "name": "Giant tubeworm \u00b7 Riftia pachyptila",
+        "status": "Detailed authored model",
+        "note": "Internal chemosynthetic bacterial partners support nutrition.",
+        "source": "https://www.mbari.org/animal/giant-tubeworm/"
+      },
+      {
+        "name": "Vent crustaceans",
+        "status": "Representative moving silhouettes",
+        "note": "Small animated forms add activity; not identified or anatomically accurate shrimp.",
+        "source": "https://oceanexplorer.noaa.gov/ocean-fact/photochemo/"
+      }
+    ]
+  },
+  {
+    "title": "BACTERIA AND ARCHAEA",
+    "description": "Microbial life includes chemosynthetic communities. Metabolism and tolerance are different characteristics.",
+    "entries": [
+      {
+        "name": "Chimney microbial communities",
+        "status": "Real licensed microscopy in catalog",
+        "note": "Old City chimney samples show varied cell shapes. Pale scenery mats are illustrative; the photograph does not identify a species by shape.",
+        "source": "https://www.nature.com/articles/s41396-020-00816-7"
+      }
+    ]
+  },
+  {
+    "title": "EXTREMOPHILE RESEARCH TARGETS",
+    "description": "Organize adaptations independently: high pressure (piezophily), high temperature (thermophily), high pH (alkaliphily), and others. Tolerating a condition is not necessarily preferring it.",
+    "entries": [
+      {
+        "name": "Pressure-adapted microbes",
+        "status": "Future research candidate",
+        "note": "Select a documented species and culture evidence before implementing research rewards.",
+        "source": "https://oceanservice.noaa.gov/facts/extremophile.html"
+      }
+    ]
+  }
+]
