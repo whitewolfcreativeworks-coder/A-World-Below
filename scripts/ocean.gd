@@ -649,7 +649,11 @@ func _release_touch_button(button: Button) -> void:
 	button.button_up.emit()
 
 func _input(event: InputEvent) -> void:
-	if not is_instance_valid(hud) or hud.modal:
+	if not is_instance_valid(hud):
+		return
+	if hud.modal:
+		if hud.handle_music_touch(event):
+			get_viewport().set_input_as_handled()
 		return
 	# Standard Controls use one emulated mouse; gameplay touch is routed per finger.
 	# Modal menus and the specimen viewer keep their existing GUI input path.

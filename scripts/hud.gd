@@ -32,6 +32,11 @@ var music_panel: PanelContainer
 var music_toggle: Button
 var music_volume: HSlider
 var music_volume_label: Label
+var music_tracks: ScrollContainer
+var music_scroll_id := -1
+var music_scroll_start := Vector2.ZERO
+var music_scroll_origin := 0
+var music_scroll_dragged := false
 var sonar: Control
 var specimen_view: Control
 
@@ -167,11 +172,13 @@ func _button(text: String, callback: Callable) -> Button:
 	return button
 
 func _open_modal() -> void:
+	music_scroll_id = -1
 	modal = true
 	game.clear_touch_controls()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if is_instance_valid(overlay):
-		overlay.free()
+		overlay.hide()
+		overlay.queue_free()
 	overlay = PanelContainer.new()
 	root.add_child(overlay)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -226,6 +233,7 @@ func show_specimen() -> void:
 	inspector.closed.connect(close_modal)
 
 func close_modal() -> void:
+	music_scroll_id = -1
 	game.set_inspection_mode(false)
 	if is_instance_valid(overlay):
 		overlay.hide()
@@ -345,6 +353,7 @@ func show_music() -> void:
 	overlay_content.add_child(music_volume)
 	overlay_content.add_child(_label("CHOOSE A TRACK",12,Color("91b5b8")))
 	var tracks := ScrollContainer.new()
+	music_tracks = tracks
 	tracks.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	tracks.custom_minimum_size.y = 100
 	tracks.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -358,6 +367,37 @@ func show_music() -> void:
 		music_buttons.append(button)
 		list.add_child(button)
 	refresh_music()
+
+func handle_music_touch(event: InputEvent) -> bool:
+	if not is_instance_valid(music_panel) or music_panel != overlay or not music_panel.visible or not is_instance_valid(music_tracks):
+		return false
+	var area := music_tracks.get_global_rect()
+	if event is InputEventMouse and event.device == InputEvent.DEVICE_ID_EMULATION:
+		return music_scroll_id != -1 or area.has_point(event.position)
+	if event is InputEventScreenTouch:
+		if event.pressed and area.has_point(event.position):
+			if music_scroll_id == -1:
+				music_scroll_id = event.index
+				music_scroll_start = event.position
+				music_scroll_origin = music_tracks.scroll_vertical
+				music_scroll_dragged = false
+			return true
+		if not event.pressed and event.index == music_scroll_id:
+			music_scroll_id = -1
+			if not event.canceled and not music_scroll_dragged and area.has_point(event.position):
+				for i in range(music_buttons.size()):
+					if music_buttons[i].get_global_rect().has_point(event.position):
+						game.select_music(i)
+						break
+			return true
+	if event is InputEventScreenDrag and event.index == music_scroll_id:
+		var displacement: Vector2 = event.position - music_scroll_start
+		if displacement.length() > 10:
+			music_scroll_dragged = true
+		if music_scroll_dragged:
+			music_tracks.scroll_vertical = music_scroll_origin - roundi(displacement.y)
+		return true
+	return false
 
 func refresh_music() -> void:
 	if not is_instance_valid(music_panel) or music_panel != overlay:

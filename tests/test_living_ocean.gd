@@ -45,6 +45,35 @@ func run() -> void:
 	check(game.audio.volume_db<=-69,"Zero music volume must be effectively silent")
 	game.toggle_audio()
 	check(not game.audio.playing and not game.flow_audio.playing,"Mute must stop both sound layers")
+	game.hud.show_music()
+	await process_frame
+	var scroll: ScrollContainer = game.hud.music_tracks
+	var start: Vector2 = scroll.get_global_rect().get_center()
+	var touch := InputEventScreenTouch.new()
+	touch.index = 9
+	touch.position = start
+	touch.pressed = true
+	root.push_input(touch,true)
+	var drag := InputEventScreenDrag.new()
+	drag.index = 9
+	drag.position = start-Vector2(0,100)
+	root.push_input(drag,true)
+	touch.position = drag.position
+	touch.pressed = false
+	root.push_input(touch,true)
+	await process_frame
+	check(scroll.scroll_vertical>0 and game.music_index==3,"A native swipe must scroll without selecting a different track")
+	var button: Button = game.hud.music_buttons[3]
+	touch.position = button.get_global_rect().get_center()
+	touch.pressed = true
+	root.push_input(touch,true)
+	touch.pressed = false
+	root.push_input(touch,true)
+	await create_timer(0.4).timeout
+	check(game.music_index==3 and game.audio_enabled,"A tap on a revealed track must select it and enable audio")
+	game.hud.close_modal()
+	await process_frame
+	check(not game.hud.modal and not is_instance_valid(game.hud.music_panel),"Closing Music must dismiss the card and resume gameplay")
 	game.hud.show_catalog()
 	await process_frame
 	check(game.hud.modal and game.hud.overlay_content.find_children("*","TextureRect",true,false).size()==1,"Catalog must display real microscopy")

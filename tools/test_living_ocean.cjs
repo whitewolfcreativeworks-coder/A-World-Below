@@ -27,7 +27,7 @@ const fs = require('node:fs');
     await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     await page.waitForTimeout(500);
     await page.screenshot({path:dir+'/03-scrolled-tracks.png'});
-    await tap(190,700); await page.waitForTimeout(1100);
+    await tap(190,735); await page.waitForTimeout(1100);
     await tap(190,575); await page.waitForTimeout(200);
     await tap(170,505); await page.waitForTimeout(200);
     await page.screenshot({path:dir+'/04-volume-and-off.png'});
