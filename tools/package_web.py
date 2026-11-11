@@ -12,6 +12,9 @@ shutil.copytree(root / "LICENSES", web / "LICENSES", dirs_exist_ok=True)
 provenance = root / "assets/materials/provenance.json"
 if provenance.exists():
     shutil.copy2(provenance, web / "LICENSES/PolyHaven-provenance.json")
+science_provenance = root / "assets/science/provenance.json"
+if science_provenance.exists():
+    shutil.copy2(science_provenance, web / "LICENSES/Microscopy-provenance.json")
 for name in ("LICENSE", "THIRD_PARTY_NOTICES.md"):
     shutil.copy2(root / name, web / name)
 for path in web.rglob("*.import"):

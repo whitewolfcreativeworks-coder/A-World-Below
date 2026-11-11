@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 const TouchPad = preload("res://scripts/touch_pad.gd")
+const LifeSonar = preload("res://scripts/life_sonar.gd")
 const Inspector = preload("res://scripts/specimen_inspector.gd")
 const INK := Color("c9e5e1")
 const MINT := Color("82ddc4")
@@ -25,6 +26,9 @@ var modal := true
 var vertical := 0.0
 var toast_time := 0.0
 var last_prompt := ""
+var music_buttons: Array[Button] = []
+var music_panel: VBoxContainer
+var sonar: Control
 var specimen_view: Control
 
 func _init(owner_game: Node3D = null) -> void:
@@ -49,6 +53,39 @@ func _ready() -> void:
 	status.add_child(_label("VENT GARDEN  /  RESEARCH EXPEDITION", 12, Color("78a3a7")))
 	home_label = _label("", 15)
 	status.add_child(home_label)
+	sonar = LifeSonar.new()
+	sonar.game = game
+	sonar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_place(sonar, Vector2(30, 160), Vector2(180, 205))
+	music_panel = VBoxContainer.new()
+	_place(music_panel, Vector2(30, 365), Vector2(178, 230))
+	music_panel.add_theme_constant_override("separation", 3)
+	music_panel.add_child(_label("SOUNDTRACK", 12, MINT))
+	for i in range(game.MUSIC_NAMES.size()):
+		var index: int = i
+		var button := _button(game.MUSIC_NAMES[i], func(): game.select_music(index))
+		button.custom_minimum_size.y = 32
+		button.add_theme_stylebox_override("normal", _style(Color(0.025,0.12,0.15,0.9), 4))
+		for style_name in ["normal", "hover", "pressed"]:
+			var style := button.get_theme_stylebox(style_name).duplicate()
+			style.content_margin_top = 7
+			style.content_margin_bottom = 7
+			button.add_theme_stylebox_override(style_name,style)
+		music_buttons.append(button)
+		music_panel.add_child(button)
+	var volume := HBoxContainer.new()
+	music_panel.add_child(volume)
+	volume.add_child(_button("VOL −", func(): game.set_music_volume(game.music_volume-0.15); refresh_music()))
+	volume.add_child(_button("VOL +", func(): game.set_music_volume(game.music_volume+0.15); refresh_music()))
+	music_panel.add_child(_button("LIFE CATALOG", show_catalog))
+	for button in music_panel.find_children("*", "Button", true, false):
+		button.custom_minimum_size.y = 32
+		for style_name in ["normal", "hover", "pressed"]:
+			var compact_style: StyleBoxFlat = button.get_theme_stylebox(style_name).duplicate()
+			compact_style.content_margin_top = 6
+			compact_style.content_margin_bottom = 6
+			button.add_theme_stylebox_override(style_name,compact_style)
+	refresh_music()
 	var right := VBoxContainer.new()
 	_place(right, Vector2(-340, 26), Vector2(310, 150), Control.PRESET_TOP_RIGHT)
 	var actions := HBoxContainer.new()
@@ -186,12 +223,12 @@ func _paragraph(text: String, color: Color = INK) -> void:
 func show_welcome() -> void:
 	_open_modal()
 	overlay.add_theme_stylebox_override("panel", _style(Color(0.005, 0.025, 0.04, 0.72), 0))
-	overlay_content.add_child(_label("STUDY 03  /  WATER & LIGHT", 14, MINT))
+	overlay_content.add_child(_label("STUDY 04  /  SIGNALS OF LIFE", 14, MINT))
 	overlay_content.add_child(_label("A World Below", 58))
 	_paragraph("Life at the edge of the impossible.")
 	_paragraph("Descend into a compact hydrothermal habitat. Examine a giant tubeworm in full 3D and discover the bacterial partnership that sustains it.")
 	_paragraph("DISCOVER  /  EXAMINE  /  UNDERSTAND  /  INVENT", MINT)
-	_paragraph("Feel the current and coast between strokes. Watch suspended particles drift past.\niPad: left pad to swim, drag to look, RISE / DIVE for depth. SWAY OFF reduces camera motion.\nIn the specimen viewer: rotate, zoom, and compare the optional holographic SCAN LAYER.")
+	_paragraph("Follow green life contacts on the compass sonar; the gold square marks home. Choose a soundtrack on the left. Ambient sound begins when you enter.\nFeel the current and coast between strokes. Watch suspended particles drift past.\niPad: left pad to swim, drag to look, RISE / DIVE for depth. SWAY OFF reduces camera motion.\nIn the specimen viewer: rotate, zoom, and compare the optional holographic SCAN LAYER.")
 	overlay_content.add_child(_button("ENTER THE VENT GARDEN", close_modal))
 	overlay_content.add_child(_button("EXAMINE THE TUBEWORM · FULL 3D", show_specimen))
 	overlay_content.add_child(_button("TOOLS & CREDITS", show_credits))
@@ -236,9 +273,9 @@ func show_journal() -> void:
 func show_credits() -> void:
 	_open_modal()
 	overlay_content.add_child(_label("BUILT WITH OPEN SOURCE", 36))
-	_paragraph("Godot Engine 4.6.3 · MIT license\nFastNoiseLite · MIT license · included with Godot\nBlender 4.3.2 · GPL production tool · available for the next art pass")
+	_paragraph("Godot Engine 4.6.3 · MIT license\nFastNoiseLite · MIT license · included with Godot\nBlender 4.3.2 · GPL production tool")
 	_paragraph("Original models, interface graphics, and synthesized audio. Bare-rock material maps: Poly Haven, CC0. Research references: NOAA Ocean Exploration and MBARI. These organizations do not endorse this game.")
-	_paragraph("Animal colors, scale, abundance, and coexistence are artistic simplifications. Capsule habitats and mineral gathering are fictional gameplay. No licensed scientific footage is bundled.")
+	_paragraph("Animal colors, scale, abundance, and coexistence are artistic simplifications. Capsule habitats and mineral gathering are fictional gameplay. A CC BY 4.0 scientific micrograph is included in LIFE CATALOG with attribution. Microscopy colors are not natural visible glow.")
 	overlay_content.add_child(_button("GODOT LICENSE & THIRD-PARTY NOTICES ↗", func(): OS.shell_open("https://godotengine.org/license/")))
 	overlay_content.add_child(_button("BACK TO THE OCEAN", close_modal))
 
@@ -283,3 +320,32 @@ func update_status(delta: float) -> void:
 		interact_button.text = "SCAN / COLLECT  [E]"
 	toast_time = maxf(0.0, toast_time - delta)
 	toast_label.visible = toast_time > 0 and not modal
+
+func refresh_music() -> void:
+	for i in range(music_buttons.size()):
+		music_buttons[i].text = ("> " if i == game.music_index else "") + game.MUSIC_NAMES[i]
+
+func show_catalog() -> void:
+	_open_modal()
+	overlay_content.add_child(_label("ATLAS OF DEEP LIFE", 36, MINT))
+	_paragraph("A growing research catalog, from midwater animals to microbial life. Listed candidates are not all implemented. Habitat and adaptation groups overlap; depth alone does not make an organism a thermophile.")
+	var catalog: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/life_catalog.json"))
+	for group in catalog:
+		overlay_content.add_child(_label(group.title, 25, MINT))
+		_paragraph(group.description)
+		for entry in group.entries:
+			_paragraph("%s  ·  %s\n%s" % [entry.name,entry.status,entry.note], Color("a6bec0"))
+			var url: String = entry.source
+			overlay_content.add_child(_button("SCIENTIFIC REFERENCE ↗",func(): OS.shell_open(url)))
+	overlay_content.add_child(_label("REAL MICROSCOPY · VENT CHIMNEY SAMPLES", 24, MINT))
+	var image := TextureRect.new()
+	image.texture = load("res://assets/science/vent_microbes.webp")
+	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	image.custom_minimum_size = Vector2(0,420)
+	overlay_content.add_child(image)
+	_paragraph("Confocal microscopy from Old City hydrothermal chimney samples. Imaging colors are not natural visible bioluminescence. Shapes alone do not identify species. This is a scientific observation, not a 3D skin.")
+	_paragraph("Aurélien Lecoeuvre, Bénédicte Ménez, Mathilde Cannat, Valérie Chavagnac & Emmanuelle Gérard (2020). CC BY 4.0. Image unchanged; scaled for display.", Color("8cabad"))
+	overlay_content.add_child(_button("IMAGE LICENSE · CC BY 4.0 ↗",func(): OS.shell_open("https://creativecommons.org/licenses/by/4.0/")))
+	overlay_content.add_child(_button("MICROSCOPY PAPER ↗",func(): OS.shell_open("https://www.nature.com/articles/s41396-020-00816-7")))
+	overlay_content.add_child(_button("BACK TO THE OCEAN",close_modal))

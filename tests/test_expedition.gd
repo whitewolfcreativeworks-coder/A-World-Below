@@ -25,7 +25,7 @@ func run() -> void:
 	game.interact()
 	check(game.progress.discovered.has("atolla"), "Approach and interact must scan creature")
 	game.interact()
-	check(game.progress.discovered.size() == 1, "Scanning again must not duplicate discovery")
+	check(game.progress.discovered.count("atolla") == 1, "Scanning again must not duplicate discovery even with other animals nearby")
 	var ids: Array[String] = []
 	for i in range(4):
 		var id := "intro:%d" % i

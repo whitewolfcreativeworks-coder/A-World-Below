@@ -29,6 +29,8 @@ jobs:
         run: XDG_DATA_HOME="$RUNNER_TEMP/awb-water" godot --headless --path . --script tests/test_water.gd
       - name: Independent multitouch checks
         run: XDG_DATA_HOME="$RUNNER_TEMP/awb-touch" godot --headless --path . --script tests/test_multitouch.gd
+      - name: Living ocean checks
+        run: XDG_DATA_HOME="$RUNNER_TEMP/awb-living" godot --headless --path . --script tests/test_living_ocean.gd
       - name: Export browser build
         run: |
           mkdir -p build/web
