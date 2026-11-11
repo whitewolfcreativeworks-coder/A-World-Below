@@ -52,3 +52,21 @@ offline renderer is `tools/compose_music.py` (NumPy and ffmpeg are production to
 not game dependencies). No third-party recordings or sample libraries are used.
 Coral, sponge, microbial mat and moving crustacean silhouettes are original
 representative forms, not scans or identified species reconstructions.
+
+## Habitat photo atlas (design reference; separate from the game runtime)
+
+`docs/habitat-atlas/images/` contains nine public-domain U.S. federal NOAA
+photographs and one figure licensed CC BY 4.0. Each photo has an exact source,
+credit, checksum, download date and changes record in the adjacent
+`provenance.json`; the atlas displays source and credit next to the image.
+Federal-image usage follows the [NOAA media guidance](https://oceanexplorer.noaa.gov/about/media-kit/),
+with no third-party copyrighted images selected. Some NOAA-hosted content has
+other licenses; this collection is individually reviewed.
+
+`hadal.jpg`: Jamieson AJ, Stewart HA, Weston JNJ, Lahey P and Vescovo VL (2022),
+*Hadal Biodiversity, Habitats and Potential Chemosynthesis in the Java Trench,
+Eastern Indian Ocean*, Frontiers in Marine Science 9:856992, Figure 4,
+[doi:10.3389/fmars.2022.856992](https://doi.org/10.3389/fmars.2022.856992),
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Resized and re-encoded
+JPEG; no content edits. Attribution and license link remain with any reused copy.
+No scientific organization endorses this project.

@@ -1,0 +1,358 @@
+{
+  "schema_version": 1,
+  "status": "research_and_design_only",
+  "depth_zones": {
+    "bathyal": "Working design band: roughly 200–3,000 m",
+    "abyssal": "Working design band: roughly 3,000–6,000 m",
+    "hadal": "Working design band: deeper than roughly 6,000 m"
+  },
+  "note": "Broad design conventions, not exact species ranges. Recipes do not yet drive the live game. Check each taxon and site before population.",
+  "habitats": [
+    {
+      "id": "coral",
+      "name": "Coral terraces",
+      "tag": "Current-fed outcrop",
+      "province": [
+        "seamount",
+        "continental_margin"
+      ],
+      "depth_zone": [
+        "bathyal"
+      ],
+      "look": "Branching fans rise above rough stone. Small animals occupy branches, ledges and crevices; bare rock remains visible between colonies.",
+      "life": [
+        "Cold-water corals",
+        "Brittle stars",
+        "Squat lobsters",
+        "Attached sponges"
+      ],
+      "terrain": "Layered hard outcrops with sheltered pockets and exposed crests.",
+      "movement": "Flexible branches respond gently to current; drifting food particles show flow direction.",
+      "arrival": "A few isolated fans appear first. Around a ridge, the silhouettes become a layered garden.",
+      "scenario": "Follow the current to document animals sheltering on a coral colony.",
+      "research": "Study suspension feeding and cooperative habitat structure; proposed village filtration research.",
+      "rules": [
+        "Require hard substrate and sufficient food/current.",
+        "Cluster colonies; vary height, spacing and orientation.",
+        "Exclude the hot center of active vents."
+      ],
+      "variations": [
+        "Fan-dominated ledge",
+        "Boulder coral garden",
+        "Sparse crest becoming a dense terrace"
+      ],
+      "reference": "Papahānaumokuākea expedition coral-and-sponge community; exact image depth not verified.",
+      "certainty": "Representative habitat, not a measured reconstruction.",
+      "status": "design_recipe_not_runtime",
+      "key": "coral",
+      "image": "images/coral.jpg"
+    },
+    {
+      "id": "sponge",
+      "name": "Sponge gardens",
+      "tag": "Animal-built landscape",
+      "province": [
+        "seamount",
+        "continental_margin"
+      ],
+      "depth_zone": [
+        "bathyal",
+        "abyssal"
+      ],
+      "look": "Pale cups and irregular sponge forms stand against a low rocky platform. The colony has open gaps, overhangs and contrasting textures.",
+      "life": [
+        "Sponges",
+        "Associated corals",
+        "Small crustaceans",
+        "Other attached filter feeders"
+      ],
+      "terrain": "Carbonate ledges and hard patches, with sediment between them.",
+      "movement": "Subtle current-driven particles; animals moving between stationary structures.",
+      "arrival": "Low cups and scattered forms gradually resolve into a garden across the platform.",
+      "scenario": "Compare organisms at exposed and sheltered edges of a colony.",
+      "research": "Explore sponge-associated microbial partnerships; potential filtration concepts are fictional upgrades.",
+      "rules": [
+        "Use hard attachment points.",
+        "Allow mixed coral/sponge patches.",
+        "Choose actual sponge species only after depth and region verification."
+      ],
+      "variations": [
+        "Cup field",
+        "Mixed encrusting and upright forms",
+        "Ledge overhang"
+      ],
+      "reference": "NOAA 2021 North Atlantic Stepping Stones, Dive 08 carbonate platform.",
+      "certainty": "An example site, not the appearance of every sponge habitat.",
+      "status": "design_recipe_not_runtime",
+      "key": "sponge",
+      "image": "images/sponge.jpg"
+    },
+    {
+      "id": "canyon",
+      "name": "Canyon walls",
+      "tag": "Vertical exploration",
+      "province": [
+        "continental_margin"
+      ],
+      "depth_zone": [
+        "bathyal",
+        "abyssal"
+      ],
+      "look": "A wall fills the view. Bedding, cracks and undercuts create stacked shelters; attached life uses suitable exposed surfaces.",
+      "life": [
+        "Corals",
+        "Sponges",
+        "Octopuses at some sites",
+        "Ledge-associated animals"
+      ],
+      "terrain": "Walls, terraces, eroded pockets and talus below the cliff.",
+      "movement": "Cross-flow around ledges; localized sediment plumes near the bottom.",
+      "arrival": "The floor slopes, scattered blocks increase, then a wall rises into the headlamp beam.",
+      "scenario": "Search successive ledges and look beneath overhangs for sheltered life.",
+      "research": "Compare attachment and shelter strategies; proposed habitat engineering research.",
+      "rules": [
+        "Place attached animals using surface normals, including walls.",
+        "Keep swim routes around ledges.",
+        "Separate geological layers from biological colonies."
+      ],
+      "variations": [
+        "Narrow passage",
+        "Broad terraced wall",
+        "Undercut alcoves"
+      ],
+      "reference": "NOAA East of Veatch Canyon image, Exploring Atlantic Canyons and Seamounts 2014.",
+      "certainty": "Do not infer species or brooding behavior for every generated alcove.",
+      "status": "design_recipe_not_runtime",
+      "key": "canyon",
+      "image": "images/canyon.jpg"
+    },
+    {
+      "id": "vent",
+      "name": "Hydrothermal vent fields",
+      "tag": "Heat and chemical energy",
+      "province": [
+        "volcanic_ridge"
+      ],
+      "depth_zone": [
+        "bathyal",
+        "abyssal"
+      ],
+      "look": "Dark mineral towers, turbulent mineral-laden fluid and dense animal patches. Life concentrates around suitable mixed waters rather than filling every surface.",
+      "life": [
+        "Vent crustaceans",
+        "Gastropods",
+        "Polychaete worms",
+        "Chemosynthetic microbial communities"
+      ],
+      "terrain": "Fractured volcanic substrate, chimneys and mineral aprons.",
+      "movement": "Rising fluid bends with the ambient current; shimmering flow and moving animals define the scene.",
+      "arrival": "Fractures and mineral staining lead to diffuse flow, then the towers appear through suspended particles.",
+      "scenario": "Compare a cool mixing zone with a hotter vent outlet using instruments.",
+      "research": "Microbial heat/chemical adaptations; engineered bioreactor concepts remain game fiction.",
+      "rules": [
+        "Require hydrothermal circulation in suitable geology.",
+        "Mix hot outlet fluid into cold surrounding water.",
+        "Use province-appropriate species; this Marianas image does not document Riftia."
+      ],
+      "variations": [
+        "Isolated active tower",
+        "Dense chimney cluster",
+        "Diffuse-flow apron beside an inactive tower"
+      ],
+      "reference": "NOAA 2016 Deepwater Exploration of the Marianas: active chimney with vent animals.",
+      "certainty": "Black smoke is suspended minerals, not combustion or a universal gas-bubble effect.",
+      "status": "design_recipe_not_runtime",
+      "key": "vent",
+      "image": "images/vent.jpg"
+    },
+    {
+      "id": "seep",
+      "name": "Cold seeps",
+      "tag": "Chemical energy without volcanic heat",
+      "province": [
+        "sedimentary_margin"
+      ],
+      "depth_zone": [
+        "bathyal",
+        "abyssal"
+      ],
+      "look": "Mussel beds gather under a carbonate ledge, with patchy microbial cover and sediment around them. Bubble streams occur at some seeps, not all.",
+      "life": [
+        "Seep mussels",
+        "Microbial mats",
+        "Seep tubeworms at suitable sites",
+        "Associated grazers and scavengers"
+      ],
+      "terrain": "Sediment, carbonate crusts, cracks and overhangs.",
+      "movement": "Where documented, escaping gas bubbles rise from small sources; other seeps appear visually quiet.",
+      "arrival": "An isolated shell patch leads to carbonate slabs, then a living bed beneath an overhang.",
+      "scenario": "Trace a chemical gradient and compare a living mussel bed with empty shells.",
+      "research": "Methane- and sulfur-associated symbioses; proposed chemical-sensing technology.",
+      "rules": [
+        "Require a localized fluid/chemical source.",
+        "Tie animals to gradients and attachment surfaces.",
+        "Keep hydrate and bubbles conditional on local conditions."
+      ],
+      "variations": [
+        "Carbonate overhang bed",
+        "Patchy mat plain",
+        "Bubbling seep among mixed attached life"
+      ],
+      "reference": "NOAA Bathymodiolus mussels beneath carbonate; secondary image shows an Alaska bubbling seep.",
+      "certainty": "Hydrate presence in the reference is not a rule for all seeps.",
+      "status": "design_recipe_not_runtime",
+      "key": "seep",
+      "image": "images/seep.jpg"
+    },
+    {
+      "id": "brine",
+      "name": "Brine-pool margins",
+      "tag": "A sharp chemical boundary",
+      "province": [
+        "salt_bearing_basin"
+      ],
+      "depth_zone": [
+        "bathyal"
+      ],
+      "look": "A distinct pool-like surface sits within the seabed. The reference pool is small; surrounding terrain is as important as the liquid boundary.",
+      "life": [
+        "Boundary-associated microbial communities",
+        "Site-dependent mussels or other margin fauna"
+      ],
+      "terrain": "A depression linked to saline fluid sources, with a distinct rim.",
+      "movement": "Density-interface ripples and refraction; avoid treating it as an air-filled lake.",
+      "arrival": "Sediment changes around a depression and a reflective-looking boundary resolves at close range.",
+      "scenario": "Sample along the edge while comparing salinity and oxygen readings.",
+      "research": "Salt-adaptation research candidates; village applications require a documented organism.",
+      "rules": [
+        "Require suitable salt-bearing geology and brine supply.",
+        "Constrain pools to depressions.",
+        "Do not fill anoxic brine with ordinary fish and corals."
+      ],
+      "variations": [
+        "Small isolated pool",
+        "Irregular rim",
+        "Several connected seep-fed pockets"
+      ],
+      "reference": "NOAA Gulf of Mexico, 19 April 2018: 1.2 m pool at 1,067 m depth.",
+      "certainty": "Pool size, salinity, toxicity and rim communities vary; this is not a hadal reference.",
+      "status": "design_recipe_not_runtime",
+      "key": "brine",
+      "image": "images/brine.jpg"
+    },
+    {
+      "id": "nodules",
+      "name": "Abyssal nodule fields",
+      "tag": "Quiet detail and scattered life",
+      "province": [
+        "abyssal_basin"
+      ],
+      "depth_zone": [
+        "abyssal"
+      ],
+      "look": "Small dark nodules interrupt fine sediment. Repeated small forms create texture; trails, burrows and isolated animals provide discoveries rather than a continuous forest.",
+      "life": [
+        "Nodule-attached organisms",
+        "Sediment fauna",
+        "Sea cucumbers and brittle stars at suitable sites",
+        "Microbial communities"
+      ],
+      "terrain": "Broad sediment expanses with varying nodule cover and occasional exposed rock.",
+      "movement": "Slow benthic activity and drifting marine snow; background density stays modest.",
+      "arrival": "Rock relief diminishes, sediment opens out and scattered nodules gradually become a field.",
+      "scenario": "Use the scanner to discover small life attached to hard nodules.",
+      "research": "Explore attachment and slow-growth strategies; proposed gentle sampling tools.",
+      "rules": [
+        "Keep background animal abundance lower than biological hotspots.",
+        "Vary nodule size and coverage with coherent patches.",
+        "Do not imply nodules regenerate on a gameplay timescale."
+      ],
+      "variations": [
+        "Scattered nodules",
+        "Dense dark field",
+        "Burrowed sediment corridor"
+      ],
+      "reference": "NOAA 2026 Cook Islands ROV Exploration, Dive 08: nodule-covered seamount substrate, starting depth 3,700 m.",
+      "certainty": "This photograph is seamount substrate, not proof of a flat plain. Not all abyssal seabeds contain nodules or share this density.",
+      "status": "design_recipe_not_runtime",
+      "key": "nodules",
+      "image": "images/nodules.jpg"
+    },
+    {
+      "id": "whale",
+      "name": "Whale-fall discoveries",
+      "tag": "Rare food-fall encounter",
+      "province": [
+        "continental_margin",
+        "abyssal_basin"
+      ],
+      "depth_zone": [
+        "bathyal",
+        "abyssal"
+      ],
+      "look": "A large skeleton forms a recognizable focal point on sediment. The carcass or bones support different communities as the fall ages.",
+      "life": [
+        "Scavengers",
+        "Bone-associated worms such as Osedax where documented",
+        "Microbial communities",
+        "Later suspension feeders"
+      ],
+      "terrain": "A local food-fall patch placed over an otherwise eligible seabed.",
+      "movement": "Concentrated local activity around food and shelter; not constant uniform swarms.",
+      "arrival": "Scattered bones or scavengers draw attention before the main skeleton enters the beam.",
+      "scenario": "Document a chosen stage of decomposition and the organisms using it.",
+      "research": "Study nutrient recycling and symbioses; proposed waste-processing research.",
+      "rules": [
+        "Treat as a rare encounter overlay, not a continent-sized biome.",
+        "Choose one persistent stage when generating.",
+        "Avoid bait-camera abundance as a background-density target."
+      ],
+      "variations": [
+        "Recent fall",
+        "Exposed skeleton",
+        "Older colonized bones"
+      ],
+      "reference": "NOAA Undersea Research Program gray-whale skeleton photograph, 2004; low resolution.",
+      "certainty": "The photograph illustrates a skeletal stage, not all stages simultaneously.",
+      "status": "design_recipe_not_runtime",
+      "key": "whale",
+      "image": "images/whale.jpg"
+    },
+    {
+      "id": "hadal",
+      "name": "Hadal trench mosaics",
+      "tag": "Deepest-region reference",
+      "province": [
+        "subduction_trench"
+      ],
+      "depth_zone": [
+        "hadal"
+      ],
+      "look": "The Java Trench figure shows both fine sediment and rougher slopes. The trench is a mosaic of terrain, not an endless vertical crack or a universal lush reef.",
+      "life": [
+        "Pressure-adapted microbes",
+        "Site-specific amphipods and other invertebrates"
+      ],
+      "terrain": "Fine sediment on flatter floors; bedrock and debris on steeper sections.",
+      "movement": "Sparse local animal movement and instrument-led discoveries.",
+      "arrival": "The route descends through progressively changing substrate and relief, with suitable depth-specific life.",
+      "scenario": "Survey a sediment pocket and nearby rock exposure while monitoring pressure.",
+      "research": "Pressure adaptation; fictional high-pressure lab upgrades need documented species evidence.",
+      "rules": [
+        "Reserve for a genuine deeper progression band.",
+        "Use pressure/depth checks independently of geology.",
+        "Potential chemosynthetic deposits in the study remain a hypothesis, not confirmed vents."
+      ],
+      "variations": [
+        "Soft floor",
+        "Rocky slope",
+        "Sediment pocket below a wall"
+      ],
+      "reference": "Jamieson et al. 2022, Figure 4; Java Trench observations including 5,760–7,168 m panels.",
+      "certainty": "One trench study; it cannot stand for every trench or the deepest point in every ocean.",
+      "status": "design_recipe_not_runtime",
+      "key": "hadal",
+      "image": "images/hadal.jpg"
+    }
+  ]
+}
