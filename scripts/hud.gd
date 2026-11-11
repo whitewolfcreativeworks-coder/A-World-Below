@@ -27,7 +27,16 @@ var vertical := 0.0
 var toast_time := 0.0
 var last_prompt := ""
 var music_buttons: Array[Button] = []
-var music_panel: VBoxContainer
+var music_button: Button
+var music_panel: PanelContainer
+var music_toggle: Button
+var music_volume: HSlider
+var music_volume_label: Label
+var music_tracks: ScrollContainer
+var music_scroll_id := -1
+var music_scroll_start := Vector2.ZERO
+var music_scroll_origin := 0
+var music_scroll_dragged := false
 var sonar: Control
 var specimen_view: Control
 
@@ -57,35 +66,10 @@ func _ready() -> void:
 	sonar.game = game
 	sonar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_place(sonar, Vector2(30, 160), Vector2(180, 205))
-	music_panel = VBoxContainer.new()
-	_place(music_panel, Vector2(30, 365), Vector2(178, 230))
-	music_panel.add_theme_constant_override("separation", 3)
-	music_panel.add_child(_label("SOUNDTRACK", 12, MINT))
-	for i in range(game.MUSIC_NAMES.size()):
-		var index: int = i
-		var button := _button(game.MUSIC_NAMES[i], func(): game.select_music(index))
-		button.custom_minimum_size.y = 32
-		button.add_theme_stylebox_override("normal", _style(Color(0.025,0.12,0.15,0.9), 4))
-		for style_name in ["normal", "hover", "pressed"]:
-			var style := button.get_theme_stylebox(style_name).duplicate()
-			style.content_margin_top = 7
-			style.content_margin_bottom = 7
-			button.add_theme_stylebox_override(style_name,style)
-		music_buttons.append(button)
-		music_panel.add_child(button)
-	var volume := HBoxContainer.new()
-	music_panel.add_child(volume)
-	volume.add_child(_button("VOL −", func(): game.set_music_volume(game.music_volume-0.15); refresh_music()))
-	volume.add_child(_button("VOL +", func(): game.set_music_volume(game.music_volume+0.15); refresh_music()))
-	music_panel.add_child(_button("LIFE CATALOG", show_catalog))
-	for button in music_panel.find_children("*", "Button", true, false):
-		button.custom_minimum_size.y = 32
-		for style_name in ["normal", "hover", "pressed"]:
-			var compact_style: StyleBoxFlat = button.get_theme_stylebox(style_name).duplicate()
-			compact_style.content_margin_top = 6
-			compact_style.content_margin_bottom = 6
-			button.add_theme_stylebox_override(style_name,compact_style)
-	refresh_music()
+	music_button = _button("Music", show_music)
+	music_button.tooltip_text = "Music controls and tracks"
+	music_button.add_theme_stylebox_override("normal",_style(Color(0.025,0.12,0.15,0.94),22))
+	_place(music_button, Vector2(30,365),Vector2(112,44))
 	var right := VBoxContainer.new()
 	_place(right, Vector2(-340, 26), Vector2(310, 150), Control.PRESET_TOP_RIGHT)
 	var actions := HBoxContainer.new()
@@ -188,11 +172,13 @@ func _button(text: String, callback: Callable) -> Button:
 	return button
 
 func _open_modal() -> void:
+	music_scroll_id = -1
 	modal = true
 	game.clear_touch_controls()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if is_instance_valid(overlay):
-		overlay.free()
+		overlay.hide()
+		overlay.queue_free()
 	overlay = PanelContainer.new()
 	root.add_child(overlay)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -228,7 +214,7 @@ func show_welcome() -> void:
 	_paragraph("Life at the edge of the impossible.")
 	_paragraph("Descend into a compact hydrothermal habitat. Examine a giant tubeworm in full 3D and discover the bacterial partnership that sustains it.")
 	_paragraph("DISCOVER  /  EXAMINE  /  UNDERSTAND  /  INVENT", MINT)
-	_paragraph("Follow green life contacts on the compass sonar; the gold square marks home. Choose a soundtrack on the left. Ambient sound begins when you enter.\nFeel the current and coast between strokes. Watch suspended particles drift past.\niPad: left pad to swim, drag to look, RISE / DIVE for depth. SWAY OFF reduces camera motion.\nIn the specimen viewer: rotate, zoom, and compare the optional holographic SCAN LAYER.")
+	_paragraph("Follow green life contacts on the compass sonar; the gold square marks home. Tap Music on the left to choose a soundtrack. Ambient sound begins when you enter.\nFeel the current and coast between strokes. Watch suspended particles drift past.\niPad: left pad to swim, drag to look, RISE / DIVE for depth. SWAY OFF reduces camera motion.\nIn the specimen viewer: rotate, zoom, and compare the optional holographic SCAN LAYER.")
 	overlay_content.add_child(_button("ENTER THE VENT GARDEN", close_modal))
 	overlay_content.add_child(_button("EXAMINE THE TUBEWORM · FULL 3D", show_specimen))
 	overlay_content.add_child(_button("TOOLS & CREDITS", show_credits))
@@ -247,6 +233,7 @@ func show_specimen() -> void:
 	inspector.closed.connect(close_modal)
 
 func close_modal() -> void:
+	music_scroll_id = -1
 	game.set_inspection_mode(false)
 	if is_instance_valid(overlay):
 		overlay.hide()
@@ -256,6 +243,7 @@ func close_modal() -> void:
 
 func show_journal() -> void:
 	_open_modal()
+	overlay_content.add_child(_button("LIFE CATALOG", show_catalog))
 	overlay_content.add_child(_label("FIELD JOURNAL", 38))
 	_paragraph("%d / %d inhabitants documented. Approach an animal within 16 m and choose SCAN. Observation leaves the animal undisturbed." % [game.progress.discovered.size(), game.records.size()], MINT)
 	for record in game.records:
@@ -321,9 +309,107 @@ func update_status(delta: float) -> void:
 	toast_time = maxf(0.0, toast_time - delta)
 	toast_label.visible = toast_time > 0 and not modal
 
+func show_music() -> void:
+	if modal and is_instance_valid(music_panel) and music_panel == overlay:
+		close_modal()
+		return
+	_open_modal()
+	music_panel = overlay
+	# A small floating card; its track list scrolls through normal GUI touch input.
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	overlay.position = Vector2(30,minf(420,root.size.y-370))
+	overlay.size = Vector2(340,350)
+	var card_style := _style(Color(0.015,0.065,0.085,0.98),16)
+	card_style.border_color = Color("386b70")
+	card_style.set_border_width_all(1)
+	overlay.add_theme_stylebox_override("panel",card_style)
+	var margin: MarginContainer = overlay_content.get_parent().get_parent()
+	for edge in ["left","right","top","bottom"]:
+		margin.add_theme_constant_override("margin_"+edge,0)
+	var old_scroll := overlay_content.get_parent()
+	margin.remove_child(old_scroll)
+	old_scroll.queue_free()
+	music_buttons.clear()
+	overlay_content = VBoxContainer.new()
+	overlay_content.add_theme_constant_override("separation",6)
+	margin.add_child(overlay_content)
+	var heading := HBoxContainer.new()
+	overlay_content.add_child(heading)
+	var title := _label("Music",24,MINT)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	heading.add_child(title)
+	heading.add_child(_button("Close",close_modal))
+	music_toggle = _button("",func(): game.toggle_audio(); refresh_music())
+	overlay_content.add_child(music_toggle)
+	music_volume_label = _label("",14)
+	overlay_content.add_child(music_volume_label)
+	music_volume = HSlider.new()
+	music_volume.min_value = 0
+	music_volume.max_value = 100
+	music_volume.step = 1
+	music_volume.custom_minimum_size.y = 36
+	music_volume.focus_mode = Control.FOCUS_NONE
+	music_volume.value_changed.connect(func(value: float): game.set_music_volume(value/100.0); refresh_music())
+	overlay_content.add_child(music_volume)
+	overlay_content.add_child(_label("CHOOSE A TRACK",12,Color("91b5b8")))
+	var tracks := ScrollContainer.new()
+	music_tracks = tracks
+	tracks.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tracks.custom_minimum_size.y = 100
+	tracks.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	overlay_content.add_child(tracks)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tracks.add_child(list)
+	for i in range(game.MUSIC_NAMES.size()):
+		var index: int = i
+		var button := _button(game.MUSIC_NAMES[i],func(): game.select_music(index))
+		music_buttons.append(button)
+		list.add_child(button)
+	refresh_music()
+
+func handle_music_touch(event: InputEvent) -> bool:
+	if not is_instance_valid(music_panel) or music_panel != overlay or not music_panel.visible or not is_instance_valid(music_tracks):
+		return false
+	var area := music_tracks.get_global_rect()
+	if event is InputEventMouse and event.device == InputEvent.DEVICE_ID_EMULATION:
+		return music_scroll_id != -1 or area.has_point(event.position)
+	if event is InputEventScreenTouch:
+		if event.pressed and area.has_point(event.position):
+			if music_scroll_id == -1:
+				music_scroll_id = event.index
+				music_scroll_start = event.position
+				music_scroll_origin = music_tracks.scroll_vertical
+				music_scroll_dragged = false
+			return true
+		if not event.pressed and event.index == music_scroll_id:
+			music_scroll_id = -1
+			if not event.canceled and not music_scroll_dragged and area.has_point(event.position):
+				for i in range(music_buttons.size()):
+					if music_buttons[i].get_global_rect().has_point(event.position):
+						game.select_music(i)
+						break
+			return true
+	if event is InputEventScreenDrag and event.index == music_scroll_id:
+		var displacement: Vector2 = event.position - music_scroll_start
+		if displacement.length() > 10:
+			music_scroll_dragged = true
+		if music_scroll_dragged:
+			music_tracks.scroll_vertical = music_scroll_origin - roundi(displacement.y)
+		return true
+	return false
+
 func refresh_music() -> void:
+	if not is_instance_valid(music_panel) or music_panel != overlay:
+		return
 	for i in range(music_buttons.size()):
-		music_buttons[i].text = ("> " if i == game.music_index else "") + game.MUSIC_NAMES[i]
+		if is_instance_valid(music_buttons[i]):
+			music_buttons[i].text = ("> " if i == game.music_index else "") + game.MUSIC_NAMES[i]
+	if is_instance_valid(music_toggle):
+		music_toggle.text = "ON  /  tap to turn off" if game.audio_enabled else "OFF  /  tap to turn on"
+	if is_instance_valid(music_volume):
+		music_volume.set_value_no_signal(roundi(game.music_volume*100))
+		music_volume_label.text = "Volume  %d%%" % roundi(game.music_volume*100)
 
 func show_catalog() -> void:
 	_open_modal()

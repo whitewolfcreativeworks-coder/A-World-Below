@@ -1,12 +1,12 @@
 # Signals of Life
 
-This pass adds four original 32-second looping soundtrack cues, a left-side
-selector and music volume buttons, a combined heading compass and fictional
+This pass adds four original 32-second looping soundtrack cues, a compact left-side Music button that opens a floating control card,
+a combined heading compass and fictional
 short-range life sonar, denser rocky scenery, representative cold-water coral
 and sponge colonies, pale microbial mat forms, and 48 animated crustacean forms.
 The soundtrack starts after the player's entry gesture; browser autoplay rules
-still apply. SOUND OFF mutes both the soundtrack and water wash. Music volume
-buttons affect only the soundtrack. Settings currently reset on page reload.
+still apply. SOUND OFF mutes both the soundtrack and water wash. The music volume
+slider affects only the soundtrack. Settings currently reset on page reload.
 
 Sonar covers 110 m in three dimensions. The top of the dial is the direction of
 travel, cardinal directions rotate, green dots mark animal/specimen/colony
@@ -38,3 +38,8 @@ startup, soundtrack selection/looping/mute, animation/pause, catalog imagery and
 sidebar clearance. Existing village, specimen, water and independent multitouch
 checks remain required. Browser touch/screenshots complement these checks;
 physical iPad Safari performance and listening remain user validation steps.
+
+The soundtrack controls now collapse to one 112 × 44 Music button beneath the
+sonar. Tapping it opens a small card with on/off, a volume slider and a touch-
+scrollable track list. Close (or tap Music again) returns to swimming; the game
+pauses while this card is open. LIFE CATALOG is available inside the journal.
