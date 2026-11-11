@@ -48,7 +48,7 @@ func run() -> void:
 	game.hud.show_catalog()
 	await process_frame
 	check(game.hud.modal and game.hud.overlay_content.find_children("*","TextureRect",true,false).size()==1,"Catalog must display real microscopy")
-	check(game.hud.music_panel.get_global_rect().end.y < game.hud.pad.get_global_rect().position.y,"Music sidebar must not cover joystick")
+	check(game.hud.music_button.get_global_rect().end.y < game.hud.pad.get_global_rect().position.y,"Compact music button must not cover joystick")
 	game.hud.close_modal()
 	game.free()
 	print("Living ocean checks: %d passed / %d" % [checks-failures,checks])
